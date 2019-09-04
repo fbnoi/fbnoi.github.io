@@ -14,7 +14,7 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          redis编译安装 - Beantech | 豆科技
+          Redis编译安装 - Beantech | 豆科技
         
     </title>
 
@@ -90,8 +90,10 @@
                     <div class="post-heading">
                         <div class="tags">
                             
+                              <a class="tag" href="/tags/#Redis" title="Redis">Redis</a>
+                            
                         </div>
-                        <h1>redis编译安装</h1>
+                        <h1>Redis编译安装</h1>
                         <h2 class="subheading"></h2>
                         <span class="meta">
                             Posted by John Doe on
@@ -212,7 +214,15 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <h3 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h3>
+                <h3 id="make和gcc"><a href="#make和gcc" class="headerlink" title="make和gcc"></a>make和gcc</h3><p>编译安装redis需要用到make和gcc工具，请确保已经正确安装make和gcc，运行命令查看gcc是否安装<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> gcc -v</span><br></pre></td></tr></table></figure></p>
+<h3 id="编译安装Redis"><a href="#编译安装Redis" class="headerlink" title="编译安装Redis"></a>编译安装Redis</h3><p>前往 <a href="http://redis.io/download" target="_blank" rel="noopener">http://redis.io/download</a> 下载最新稳定版本的redis压缩文件，当前的版本为5.0.5。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> wget http://download.redis.io/releases/redis-5.0.5.tar.gz</span><br></pre></td></tr></table></figure></p>
+<p>解压并进入redis文件夹:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> tar -zxvf redis-5.0.5.tar.gz</span><br><span class="line"><span class="meta">&gt;</span> cd redis-5.0.5</span><br></pre></td></tr></table></figure></p>
+<p>运行以下命令后，进入src文件夹，会发现两个可运行文件redis-server，redis-cli。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> make</span><br></pre></td></tr></table></figure></p>
+<h3 id="运行Redis"><a href="#运行Redis" class="headerlink" title="运行Redis"></a>运行Redis</h3><p>进入src文件夹运行命令：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> ./redis-server</span><br></pre></td></tr></table></figure></p>
+<p>如果出现以下界面，说明redis已经安装成功：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">8054:C 03 Sep 2019 20:01:27.594 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo</span><br><span class="line">8054:C 03 Sep 2019 20:01:27.594 # Redis version=5.0.5, bits=64, commit=00000000, modified=0, pid=8054, just started</span><br><span class="line">8054:C 03 Sep 2019 20:01:27.594 # Warning: no config file specified, using the default config. In order to specify a config file use ./redis-server /path/to/redis.conf</span><br><span class="line">8054:M 03 Sep 2019 20:01:27.596 * Increased maximum number of open files to 10032 (it was originally set to 1024).</span><br><span class="line">                _._                                                  </span><br><span class="line">           _.-``__ ''-._                                             </span><br><span class="line">      _.-``    `.  `_.  ''-._           Redis 5.0.5 (00000000/0) 64 bit</span><br><span class="line">  .-`` .-```.  ```\/    _.,_ ''-._                                   </span><br><span class="line"> (    '      ,       .-`  | `,    )     Running in standalone mode</span><br><span class="line"> |`-._`-...-` __...-.``-._|'` _.-'|     Port: 6379</span><br><span class="line"> |    `-._   `._    /     _.-'    |     PID: 8054</span><br><span class="line">  `-._    `-._  `-./  _.-'    _.-'                                   </span><br><span class="line"> |`-._`-._    `-.__.-'    _.-'_.-'|                                  </span><br><span class="line"> |    `-._`-._        _.-'_.-'    |           http://redis.io        </span><br><span class="line">  `-._    `-._`-.__.-'_.-'    _.-'                                   </span><br><span class="line"> |`-._`-._    `-.__.-'    _.-'_.-'|                                  </span><br><span class="line"> |    `-._`-._        _.-'_.-'    |                                  </span><br><span class="line">  `-._    `-._`-.__.-'_.-'    _.-'                                   </span><br><span class="line">      `-._    `-.__.-'    _.-'                                       </span><br><span class="line">          `-._        _.-'                                           </span><br><span class="line">              `-.__.-'                                               </span><br><span class="line"></span><br><span class="line">8054:M 03 Sep 2019 20:01:27.600 # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.</span><br><span class="line">8054:M 03 Sep 2019 20:01:27.600 # Server initialized</span><br><span class="line">8054:M 03 Sep 2019 20:01:27.600 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.</span><br><span class="line">8054:M 03 Sep 2019 20:01:27.600 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never &gt; /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.</span><br><span class="line">8054:M 03 Sep 2019 20:01:27.600 * DB loaded from disk: 0.000 seconds</span><br><span class="line">8054:M 03 Sep 2019 20:01:27.601 * Ready to accept connections</span><br></pre></td></tr></table></figure></p>
+<p>按 <strong><em>ctrl+c</em></strong> 停止运行redis。在redis根文件夹下有一份redis的配置文件，你可以根据需要修改redis配置。运行以下指令可以指定配置文件，你也可以直接指定配置选项。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> ./redis-server [/path/to/redis.conf] </span><br><span class="line"><span class="meta">&gt;</span> ./redis-server [--options  value]</span><br></pre></td></tr></table></figure></p>
+<p>启动redis之后，运行以下命令可以进入cli模式。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> ./redis-cli </span><br><span class="line"><span class="meta">&gt;</span> ./redis-cli shutdown      //关闭redis</span><br></pre></td></tr></table></figure></p>
+
                 
 
                 <hr>
@@ -248,7 +258,7 @@
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
           true
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#下载"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">下载</span></a></li></ol>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#make和gcc"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">make和gcc</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#编译安装Redis"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">编译安装Redis</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#运行Redis"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">运行Redis</span></a></li></ol>
         
         </div>
       </aside>
@@ -268,6 +278,8 @@
                     <h5><a href="/tags/">FEATURED TAGS</a></h5>
                     <div class="tags">
                        
+                          <a class="tag" href="/tags/#Redis" title="Redis">Redis</a>
+                        
                     </div>
                 </section>
                 
