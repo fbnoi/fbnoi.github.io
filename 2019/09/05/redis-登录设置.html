@@ -14,11 +14,11 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          FBnoI | blog
+          redis 登录设置 - FBnoI | blog
         
     </title>
 
-    <link rel="canonical" href="http://fbnoi.github.io/tags/php扩展/">
+    <link rel="canonical" href="http://fbnoi.github.io/2019/09/05/redis-登录设置.html">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -69,8 +69,8 @@
 <style type="text/css">
     header.intro-header{
         
-            background-image: url('/undefined')
-            /*page*/
+            background-image: url('')
+            /*post*/
         
     }
     
@@ -83,10 +83,18 @@
             <div class="row">
                 <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                 
-                    <div class="site-heading">
-                        <h1>FBnoI</h1>
-                        <!--<hr class="small">-->
-                        <span class="subheading">Life was like a box of chocolates, you never know what you’re gonna get</span>
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#redis" title="redis">redis</a>
+                            
+                        </div>
+                        <h1>redis 登录设置</h1>
+                        <h2 class="subheading">设置redis远程连接以及登录密码</h2>
+                        <span class="meta">
+                            Posted by FBnoI on
+                            2019-09-05
+                        </span>
                     </div>
                 
 
@@ -189,242 +197,146 @@
 
 
     <!-- Main Content -->
-    <!-- Main Content -->
-<div class="container">
-    <div class="row">
-        
+    <!-- Modify by Yu-Hsuan Yen -->
 
-<!-- USE SIDEBAR -->
-    <!-- Post Container -->
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
             <div class="
-                col-lg-8 col-lg-offset-1
-                col-md-8 col-md-offset-1
-                col-sm-12
-                col-xs-12
-                post-container
-            ">
-            
-                
-<!-- Main Content -->
-<div class="container">
-    <div class="row">
-        <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-            <!-- 归档列表 -->
-            
-            
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
 
-             <!-- 归档列表 -->
+                <p>redis默认只能从本地连接，开启远程连接需要修改redis的启动配置文件，配置文件一般在redis的安装根目录下。</p>
+<h3 id="开启远程连接"><a href="#开启远程连接" class="headerlink" title="开启远程连接"></a>开启远程连接</h3><p>打开redis 的配置文件，找到以下两行。<strong>bind</strong> 选项指定可以连接此redis的ip，指定为127.0.0.1表示只接受来自本地的连接请求。<strong>protected-mode</strong> 选项设置安全模式，开启后如果未指定bing选项并且未设置登录认证密码时，只接受来自本地的连接请求。删除bind选项并关闭protected-mode，即可开启远程连接，但在生产环境中这么做是十分危险。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">bind 127.0.0.1          //del this line</span><br><span class="line">...</span><br><span class="line">protected-mode yes      //set to no</span><br></pre></td></tr></table></figure></p>
+<p>修改之后，需要重新启动redis服务，当然配置文件必须指定为你更改的那一个。</p>
+<h3 id="添加登录密码认证"><a href="#添加登录密码认证" class="headerlink" title="添加登录密码认证"></a>添加登录密码认证</h3><p>你可以在配置文件中指定密码来设置登录密码验证，在配置文件中添加<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> requirepass your-pass</span><br></pre></td></tr></table></figure></p>
+<p>并重启redis，即可开启密码验证。<br>当然你也可以在redis-cli中直接指定密码。运行指令<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> config set requirepass your-pass</span><br></pre></td></tr></table></figure></p>
+<p>使用此方式不需要重启redis。</p>
+<h3 id="使用密码连接redis"><a href="#使用密码连接redis" class="headerlink" title="使用密码连接redis"></a>使用密码连接redis</h3><p>cli环境下，可以在连接时指定连接密码，只需要在连接时添加 <strong>-a</strong> 选项即可<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> ./redis-cli -a your-apss</span><br></pre></td></tr></table></figure></p>
+<p>或者直接连接，然后使用 <strong>auth</strong> 指令认证<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> auth your-apss</span><br></pre></td></tr></table></figure></p>
+<p>使用phpredis连接redis是需要使用 <strong>auth()</strong> 方法验证密码<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"><span class="meta">$</span>redis = new \Redis();</span><br><span class="line"><span class="meta">$</span>redis-&gt;connet($dsn);</span><br><span class="line"><span class="meta">$</span>redis-&gt;auth('your-pass');</span><br></pre></td></tr></table></figure></p>
 
-            
-            <div class="one-tag-list">
-                <span class="fa fa-calendar-times-o listing-seperator" id="2019">
-                    <span class="tag-text">2019</span>
-                </span>
-                <ul>
                 
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <li >
-                    09-05
-                    <i class="fa fa-angle-double-right" aria-hidden="true"></i>
-                    <a href="/2019/09/05/redis-登录设置.html" style="color: #0085a1">
-                        <span>
-                            redis 登录设置
-                        </span>
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </li>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <li >
-                    09-05
-                    <i class="fa fa-angle-double-right" aria-hidden="true"></i>
-                    <a href="/2019/09/05/redis-发布与订阅.html" style="color: #0085a1">
-                        <span>
-                            redis 发布与订阅
-                        </span>
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </li>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <li >
-                    09-04
-                    <i class="fa fa-angle-double-right" aria-hidden="true"></i>
-                    <a href="/2019/09/04/php-编译安装redis扩展.html" style="color: #0085a1">
-                        <span>
-                            php 编译安装redis扩展
-                        </span>
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </li>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <li >
-                    09-04
-                    <i class="fa fa-angle-double-right" aria-hidden="true"></i>
-                    <a href="/2019/09/04/redis-数据结构篇.html" style="color: #0085a1">
-                        <span>
-                            redis 数据结构篇
-                        </span>
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </li>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <li >
-                    09-04
-                    <i class="fa fa-angle-double-right" aria-hidden="true"></i>
-                    <a href="/2019/09/04/redis编译安装.html" style="color: #0085a1">
-                        <span>
-                            redis 编译安装
-                        </span>
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </li>
-                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                    
+                        <li class="next">
+                            <a href="/2019/09/05/redis-发布与订阅.html" data-toggle="tooltip" data-placement="top" title="redis 发布与订阅">Next Post &rarr;</a>
+                        </li>
+                    
                 </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
             </div>
             
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
 
+    
+      <aside id="sidebar">
+        
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+          true
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#开启远程连接"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">开启远程连接</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#添加登录密码认证"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">添加登录密码认证</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#使用密码连接redis"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">使用密码连接redis</span></a></li></ol>
+        
+        </div>
+      </aside>
+    
 
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#redis" title="redis">redis</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="#" target="_blank">It Helps SEO</a></li>
+                    
+                </ul>
+                
+            </div>
         </div>
     </div>
-</div>
+</article>
 
-                <!-- 如果开启评论功能 -->
-                
-            </div>
 
-          <!-- Sidebar Container -->
-<div class="
-    col-lg-3 col-lg-offset-0
-    col-md-3 col-md-offset-0
-    col-sm-12
-    col-xs-12
-    sidebar-container
-">
-    
-        <!-- Featured Tags -->
 
-<section>
-    <!-- no hr -->
-    <h5><a href="/tags/">FEATURED TAGS</a></h5>
-    <div class="tags">
-        
-            
-        
-            
-            <a href="/tags/#redis" title="redis" rel="5">redis</a>
-            
-        
-    </div>
-</section>
 
-        <hr>
-    
-        <!-- Short About -->
-<section class="visible-md visible-lg">
-    <h5><a href="/about/">ABOUT ME</a></h5>
-    <div class="short-about">
 
-        
-            <img id = "avatar_pic" src="/img/ironman-draw.png" />
-        
 
-        
-            <p>KEEP KEEP ON</p>
-        
 
-        <!-- SNS Link -->
-        <ul class="list-inline">
-            
-            
-            
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
 
-            
-
-            
-
-            
-                <li>
-                    <a target="_blank"  href="https://github.com/fbnoi">
-                        <span class="fa-stack fa-lg">
-                            <i class="fa fa-circle fa-stack-2x"></i>
-                            <i class="fa fa-github fa-stack-1x fa-inverse"></i>
-                        </span>
-                    </a>
-                </li>
-            
-            
-            
-            
-        </ul>
-    </div>
-</section>
-        <hr>
-    
-        
-  <h5>RECENT POSTS</h3>
-  <div class="widget">
-    <ul>
-      
-        <li>
-          <a href="/2019/09/05/redis-登录设置.html">redis 登录设置</a>
-        </li>
-      
-        <li>
-          <a href="/2019/09/05/redis-发布与订阅.html">redis 发布与订阅</a>
-        </li>
-      
-        <li>
-          <a href="/2019/09/04/php-编译安装redis扩展.html">php 编译安装redis扩展</a>
-        </li>
-      
-        <li>
-          <a href="/2019/09/04/redis-数据结构篇.html">redis 数据结构篇</a>
-        </li>
-      
-        <li>
-          <a href="/2019/09/04/redis编译安装.html">redis 编译安装</a>
-        </li>
-      
-    </ul>
-  </div>
-
-        <hr>
-    
-        <!-- Friends Blog -->
-
-<h5>FRIENDS</h5>
-<ul class="list-inline">
-
-    
-        <li><a href="#" target="_blank">It Helps SEO</a></li>
-    
-</ul>
-
-        <hr>
-    
-</div>
-
-        
-    </div>
-</div>
 
 
     <!-- Footer -->
