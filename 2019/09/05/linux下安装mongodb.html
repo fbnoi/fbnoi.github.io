@@ -14,11 +14,11 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          redis 登录设置 - FBnoI | blog
+          linux下安装mongodb - FBnoI | blog
         
     </title>
 
-    <link rel="canonical" href="http://fbnoi.github.io/2019/09/05/redis-登录设置.html">
+    <link rel="canonical" href="http://fbnoi.github.io/2019/09/05/linux下安装mongodb.html">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -86,11 +86,11 @@
                     <div class="post-heading">
                         <div class="tags">
                             
-                              <a class="tag" href="/tags/#redis" title="redis">redis</a>
+                              <a class="tag" href="/tags/#mongodb" title="mongodb">mongodb</a>
                             
                         </div>
-                        <h1>redis 登录设置</h1>
-                        <h2 class="subheading">设置redis远程连接以及登录密码</h2>
+                        <h1>linux下安装mongodb</h1>
+                        <h2 class="subheading"></h2>
                         <span class="meta">
                             Posted by FBnoI on
                             2019-09-05
@@ -210,15 +210,19 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <p>redis默认只能从本地连接，开启远程连接需要修改redis的启动配置文件，配置文件一般在redis的安装根目录下。</p>
-<h3 id="开启远程连接"><a href="#开启远程连接" class="headerlink" title="开启远程连接"></a>开启远程连接</h3><p>打开redis 的配置文件，找到以下两行。<strong>bind</strong> 选项指定可以连接此redis的ip，指定为127.0.0.1表示只接受来自本地的连接请求。<strong>protected-mode</strong> 选项设置安全模式，开启后如果未指定bing选项并且未设置登录认证密码时，只接受来自本地的连接请求。删除bind选项并关闭protected-mode，即可开启远程连接，但在生产环境中这么做是十分危险。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">bind 127.0.0.1          //del this line</span><br><span class="line">...</span><br><span class="line">protected-mode yes      //set to no</span><br></pre></td></tr></table></figure></p>
-<p>修改之后，需要重新启动redis服务，当然配置文件必须指定为你更改的那一个。</p>
-<h3 id="添加登录密码认证"><a href="#添加登录密码认证" class="headerlink" title="添加登录密码认证"></a>添加登录密码认证</h3><p>你可以在配置文件中指定密码来设置登录密码验证，在配置文件中添加<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> requirepass your-pass</span><br></pre></td></tr></table></figure></p>
-<p>并重启redis，即可开启密码验证。<br>当然你也可以在redis-cli中直接指定密码。运行指令<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> config set requirepass your-pass</span><br></pre></td></tr></table></figure></p>
-<p>使用此方式不需要重启redis。</p>
-<h3 id="使用密码连接redis"><a href="#使用密码连接redis" class="headerlink" title="使用密码连接redis"></a>使用密码连接redis</h3><p>cli环境下，可以在连接时指定连接密码，只需要在连接时添加 <strong>-a</strong> 选项即可<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> ./redis-cli -a your-apss</span><br></pre></td></tr></table></figure></p>
-<p>或者直接连接，然后使用 <strong>auth</strong> 指令认证<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> auth your-apss</span><br></pre></td></tr></table></figure></p>
-<p>使用phpredis连接redis是需要使用 <strong>auth()</strong> 方法验证密码<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"><span class="meta">$</span>redis = new \Redis();</span><br><span class="line"><span class="meta">$</span>redis-&gt;connet($dsn);</span><br><span class="line"><span class="meta">$</span>redis-&gt;auth('your-pass');</span><br></pre></td></tr></table></figure></p>
+                <h3 id="下载mongodb安装包"><a href="#下载mongodb安装包" class="headerlink" title="下载mongodb安装包"></a>下载mongodb安装包</h3><p>mongodb提供了linux各版本的安装包，前往<a href="https://www.mongodb.com/download-center/community" target="_blank" rel="noopener">https://www.mongodb.com/download-center/community</a>，并根据自己需要选择配置：<br><img src="./linux下安装mongodb/2019_9_5_mongodb1.png" alt="图1"><br>选择完成之后下方会生成一个链接，从此链接下载mongodb安装包：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1804-4.2.0.tgz</span><br></pre></td></tr></table></figure></p>
+<h3 id="安装mongodb"><a href="#安装mongodb" class="headerlink" title="安装mongodb"></a>安装mongodb</h3><p>解压下载的安装包并将其移动到你想安装的位置：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> tar -zxvf mongodb-linux-x86_64-ubuntu1804-4.2.0.tgz mongodb</span><br><span class="line"><span class="meta">&gt;</span> sudo mv mongodb-linux-x86_64-ubuntu1804-4.2.0/ /usr/local/mongodb</span><br></pre></td></tr></table></figure></p>
+<p>此时已经可以运行mongodb了。但是为了更方便的使用mongodb，可以将mongodb的而执行文件路径加入PATH:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> export PATH=/usr/local/mongodb/bin:$PATH</span><br></pre></td></tr></table></figure></p>
+<p>上述命令只能在本次会话中导入PATH，当重启另一个会话或者重启服务器之后，导入的PATH会失效。<br>修改~/.bashrc（没有时创建），在文件底部加入<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> export PATH=/usr/local/mongodb/bin:$PATH</span><br></pre></td></tr></table></figure></p>
+<p>并运行以下指令，可以查看到已经导入的PATH。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> source ~/.bashrc      //载入PATH</span><br><span class="line"><span class="meta">&gt;</span> echo $PATH            //查看PATH</span><br></pre></td></tr></table></figure></p>
+<h3 id="为mongodb添加配置文件"><a href="#为mongodb添加配置文件" class="headerlink" title="为mongodb添加配置文件"></a>为mongodb添加配置文件</h3><p>以上安装方法安装的mongodb并没有配置文件，你可以在运行mongodb时指定配置选项，但是为了更方便的管理mongodb，可以创建一个mongodb的配置文件，并从配置文件启动mongodb。</p>
+<p>mongodb的配置文件使用yml格式编写。具体的配置选项请参考<a href="https://docs.mongodb.com/manual/reference/configuration-options/" target="_blank" rel="noopener">官方文档</a>，这里只做最基本的配置：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">systemLog:</span></span><br><span class="line"><span class="attr">  destination:</span> <span class="string">file</span>                        <span class="comment">##日志保存方式</span></span><br><span class="line"><span class="attr">  path:</span> <span class="string">"/var/log/mongodb/mongod.log"</span>      <span class="comment">##日志路径</span></span><br><span class="line"><span class="attr">  logAppend:</span> <span class="literal">true</span>                          <span class="comment">##mongodb重启时将日志追加到原来日志文件内容末尾，false时创建新的日志文件</span></span><br><span class="line"><span class="attr">storage:</span></span><br><span class="line"><span class="attr">  dbPath:</span> <span class="string">/data/mongodb</span>                    <span class="comment">##数据保存路径</span></span><br><span class="line"><span class="attr">  indexBuildRetry:</span> <span class="literal">true</span>                    <span class="comment">##重启mongodb时重新创建不完整的索引</span></span><br><span class="line"><span class="attr">  journal:</span></span><br><span class="line"><span class="attr">    enabled:</span> <span class="literal">true</span>                         <span class="comment">##启用持久日志来保证数据完整性</span></span><br><span class="line"><span class="attr">processManagement:</span></span><br><span class="line"><span class="attr">  fork:</span> <span class="literal">true</span>                               <span class="comment">##开启守护进程</span></span><br><span class="line"><span class="attr">  pidFilePath:</span> <span class="string">/usr/local/mongodb/.pid</span>     <span class="comment">##pid保存路径 </span></span><br><span class="line"><span class="attr">net:</span></span><br><span class="line"><span class="attr">  bindIp:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>                        <span class="comment">##设置mongodb服务器监听ip地址，默认是127.0.0.1；如果监听多个ip地址，使用逗号隔开</span></span><br><span class="line"><span class="attr">  port:</span> <span class="number">27017</span>                              <span class="comment">##设置mongodb的监听TCP端口</span></span><br><span class="line"><span class="attr">setParameter:</span></span><br><span class="line"><span class="attr">  enableLocalhostAuthBypass:</span> <span class="literal">false</span>         <span class="comment">##关闭本地连接密码认证</span></span><br></pre></td></tr></table></figure></p>
+<p>创建并保存配置文件之后，运行mongodb时指定配置文件路径即可使用该配置。</p>
+<h3 id="运行并连接mongodb"><a href="#运行并连接mongodb" class="headerlink" title="运行并连接mongodb"></a>运行并连接mongodb</h3><p>运行命令，如果出现以下提示，则标识mongodb启动成功。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> mongod --config path/to/config</span><br><span class="line">about to fork child process, waiting until server is ready for connections.</span><br><span class="line">forked process: 5807</span><br><span class="line">child process started successfully, parent exiting</span><br></pre></td></tr></table></figure></p>
+<p>运行：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> mongod --shutdown --config path/to/config</span><br></pre></td></tr></table></figure></p>
+<p>关闭mongodb，注意一定要指定你启动mongodb时指定的配置文件路径。</p>
+<p>mongodb自带了一个管理shell，运行命令：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> mongo</span><br></pre></td></tr></table></figure></p>
+<p>进入shell管理界面。</p>
 
                 
 
@@ -226,13 +230,9 @@
                 <!-- Pager -->
                 <ul class="pager">
                     
-                        <li class="previous">
-                            <a href="/2019/09/05/linux下安装mongodb.html" data-toggle="tooltip" data-placement="top" title="linux下安装mongodb">&larr; Previous Post</a>
-                        </li>
-                    
                     
                         <li class="next">
-                            <a href="/2019/09/05/redis-发布与订阅.html" data-toggle="tooltip" data-placement="top" title="redis 发布与订阅">Next Post &rarr;</a>
+                            <a href="/2019/09/05/redis-登录设置.html" data-toggle="tooltip" data-placement="top" title="redis 登录设置">Next Post &rarr;</a>
                         </li>
                     
                 </ul>
@@ -259,7 +259,7 @@
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
           true
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#开启远程连接"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">开启远程连接</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#添加登录密码认证"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">添加登录密码认证</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#使用密码连接redis"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">使用密码连接redis</span></a></li></ol>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#下载mongodb安装包"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">下载mongodb安装包</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#安装mongodb"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">安装mongodb</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#为mongodb添加配置文件"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">为mongodb添加配置文件</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#运行并连接mongodb"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">运行并连接mongodb</span></a></li></ol>
         
         </div>
       </aside>
@@ -279,7 +279,7 @@
                     <h5><a href="/tags/">FEATURED TAGS</a></h5>
                     <div class="tags">
                        
-                          <a class="tag" href="/tags/#redis" title="redis">redis</a>
+                          <a class="tag" href="/tags/#mongodb" title="mongodb">mongodb</a>
                         
                     </div>
                 </section>
