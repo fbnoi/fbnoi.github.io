@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content>
+    <meta name="keyword" content>
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          mongodb CRUD操作 - FBnoI | blog
+        
+    </title>
+
+    <link rel="canonical" href="http://fbnoi.github.io/2019/09/06/mongodb-CRUD操作.html">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('')
+            /*post*/
+        
+    }
+    
+</style>
+
+<header class="intro-header" >
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#mongodb" title="mongodb">mongodb</a>
+                            
+                        </div>
+                        <h1>mongodb CRUD操作</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by FBnoI on
+                            2019-09-06
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">FBnoI</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <blockquote>
+<p>参考：mongodb中文文档 (<a href="http://www.mongoing.com/docs/index.html" target="_blank" rel="noopener">http://www.mongoing.com/docs/index.html</a>)，此网站上有一个非常方便的web shell窗口可供实验，建议直接在上面进行实验操作。</p>
+</blockquote>
+<h3 id="创建数据库"><a href="#创建数据库" class="headerlink" title="创建数据库"></a>创建数据库</h3><p>启动mongodb并使用shell连接mongodb。使用以下指令可以查看当前所在的mongodb的数据库。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> db</span><br></pre></td></tr></table></figure></p>
+<p>运行以下指令可以查看所有可用的数据库<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> shows dbs</span><br><span class="line">admin   0.000GB</span><br><span class="line">config  0.000GB</span><br><span class="line">local   0.000GB</span><br></pre></td></tr></table></figure></p>
+<p>使用指令：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> use &lt;database&gt;</span><br></pre></td></tr></table></figure></p>
+<p>来切换数据库，你可以切换到一个不存在的数据库，这种操作是被允许的。但是这个数据库并没有被创建，只有在你向这个数据库存储数据时，此数据库才会被创建。</p>
+<h3 id="创建集合"><a href="#创建集合" class="headerlink" title="创建集合"></a>创建集合</h3><p>使用 <strong>db.createCollection</strong> 方法创建集合，createCollection可以接受两个参数，第一个参数是创建集合的名称，第二个是创建集合时的选项：<br>| 字段 | 类型 | 描述 |<br>| —- | —- | —- |<br>| capped | 布尔 |（可选）如果为 true，则创建固定集合。固定集合是指有着固定大小的集合，当达到最大值时，它会自动覆盖最早的文档。当该值为 true 时，必须指定 size 参数。|<br>| autoIndexId | 布尔 | （可选）如为 true，自动在 _id 字段创建索引。默认为 false。|<br>| size | 数值 | （可选）为固定集合指定一个最大值（以字节计）。如果 capped 为 true，也需要指定该字段。<br>| max | 数值 | （可选）指定固定集合中包含文档的最大数量。 |</p>
+<p>以下指令将创建一个命名为 <strong>users</strong> 的集合<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> db.createCollection('users', &#123;&#125;)</span><br></pre></td></tr></table></figure></p>
+<h3 id="插入文档"><a href="#插入文档" class="headerlink" title="插入文档"></a>插入文档</h3><blockquote>
+<p><strong>notice:</strong> mongodb中所有的写操作在单一文档层级上是原子的.</p>
+</blockquote>
+<p>mongodb提供了如下方法来向集合插入数据：</p>
+<ul>
+<li>db.collection.insertOne()</li>
+<li>db.collection.insertMany()</li>
+<li>db.collection.insert()<br>如果像一个不存在的集合插入数据，mongodb会自动创建这个集合。插入的数据将存放在:db:collection下。</li>
+</ul>
+<h4 id="insertOne"><a href="#insertOne" class="headerlink" title="insertOne"></a>insertOne</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> use fbnoi</span><br><span class="line"><span class="meta">&gt;</span> db.users.insertOne(</span><br><span class="line">    &#123;</span><br><span class="line">        name: 'Tom',</span><br><span class="line">        age: 19,</span><br><span class="line">        gender: 'man',</span><br><span class="line">        friends: ['Lilith', 'Alice']</span><br><span class="line">    &#125;</span><br><span class="line">)</span><br><span class="line">// result</span><br><span class="line">&#123;</span><br><span class="line">    "acknowledged" : true,</span><br><span class="line">    "insertedId" : ObjectId("5d71b8e58adec7a910058dfc")</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上述指令将创建一个名为fbnoi的数据和一个名为users的集合，并在users中保存一条数据。可以看出，mongodb的数据结构由键值对构成，document的结构类似一个json对象，shell的语法也和js很像。值得注意的是，在返回的结果中有一个字段名为 <strong>insertedId</strong> ，这是因为在插入数据时没有为记录指定 <strong>_id</strong> 字段，mongodb为每条插入的数据自动生成并添加了此字段。</p>
+<h4 id="insertMany"><a href="#insertMany" class="headerlink" title="insertMany"></a>insertMany</h4><p>你也可以一次插入多条数据：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> db.users.insertMany([</span><br><span class="line">    &#123;</span><br><span class="line">        name: 'Tony',</span><br><span class="line">        age: 17,</span><br><span class="line">        gender: 'man',</span><br><span class="line">        friends: ['Ana']</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">        name: 'Ana',</span><br><span class="line">        age: 20,</span><br><span class="line">        gender: 'woman',</span><br><span class="line">        friends: ['Tony']</span><br><span class="line">    &#125;</span><br><span class="line">])</span><br><span class="line">// result</span><br><span class="line">&#123;</span><br><span class="line">    "acknowledged" : true,</span><br><span class="line">    "insertedIds" : [</span><br><span class="line">        ObjectId("5d71b8ba8adec7a910058dfa"),</span><br><span class="line">        ObjectId("5d71b8ba8adec7a910058dfb") </span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="insert"><a href="#insert" class="headerlink" title="insert"></a>insert</h4><p>当然你也可以使用 <strong>insert()</strong> 方法：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> db.users.insert(</span><br><span class="line">    [</span><br><span class="line">        &#123;name: 'Alice', age: 21, gender: 'man', friends: ['Lilith', 'Tom']&#125;,</span><br><span class="line">        &#123;name: 'Lilith', age: 18, gender: 'woman', friends: ['Alice', 'Tom']&#125;</span><br><span class="line">    ]</span><br><span class="line">)</span><br><span class="line">//result</span><br><span class="line">BulkWriteResult(&#123;</span><br><span class="line">        "writeErrors" : [ ],</span><br><span class="line">        "writeConcernErrors" : [ ],</span><br><span class="line">        "nInserted" : 2,</span><br><span class="line">        "nUpserted" : 0,</span><br><span class="line">        "nMatched" : 0,</span><br><span class="line">        "nModified" : 0,</span><br><span class="line">        "nRemoved" : 0,</span><br><span class="line">        "upserted" : [ ]</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<p>可以看到使用 <strong>insert()</strong> 方法返回值和 <strong>insertMany()</strong> 不同，<strong>insert()</strong> 方法返回的是一个 <a href="http://www.mongoing.com/docs/reference/method/BulkWriteResult.html#BulkWriteResult" target="_blank" rel="noopener">BulkWriteResult</a> 对象，包含了本次操作的一些信息。</p>
+<p>然而，如果使用 <strong>insert()</strong> 方法插入一条数据，将返回 <a href="http://www.mongoing.com/docs/reference/method/WriteResult.html#WriteResult" target="_blank" rel="noopener">WriteResult</a> 对象:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">WriteResult(&#123; "nInserted" : 1 &#125;)</span><br></pre></td></tr></table></figure></p>
+<h3 id="查询文档"><a href="#查询文档" class="headerlink" title="查询文档"></a>查询文档</h3><p>mongodb提供了db.collection.find()方法来查询数据。</p>
+<h4 id="集合中的所有文档"><a href="#集合中的所有文档" class="headerlink" title="集合中的所有文档"></a>集合中的所有文档</h4><p>运行指令：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> db.users.find(&#123;&#125;)</span><br></pre></td></tr></table></figure></p>
+<p>将查询 <strong>users</strong> 集合下所有的数据：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123; "_id" : ObjectId("5d71b6718adec7a910058df9"), "name" : "fbnoi", "age" : 19, "gender" : "man" &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5d71b8ba8adec7a910058dfa"), "name" : "Tony", "age" : 17, "gender" : "man" &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5d71b8ba8adec7a910058dfb"), "name" : "Ana", "age" : 20, </span><br><span class="line">"gender" : "woman" &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5d71b8e58adec7a910058dfc"), "name" : "Tom", "age" : 19, </span><br><span class="line">"gender" : "man" &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5d71ba738adec7a910058dfd"), "name" : "Alice", "age" : 21, "gender" : "man" &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5d71ba738adec7a910058dfe"), "name" : "Lilith", "age" : 18, "gender" : "woman" &#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="指定过滤条件"><a href="#指定过滤条件" class="headerlink" title="指定过滤条件"></a>指定过滤条件</h4><p>一个过滤条件的基本格式结构和json对象相似，都是基于键值对的。<br><strong>{ \&lt;field1>: \&lt;value1>, … }</strong></p>
+<h5 id="指定等于条件"><a href="#指定等于条件" class="headerlink" title="指定等于条件"></a>指定等于条件</h5><p>等于过滤条件的格式为：<br>{field1：value1, …}<br>以下指令将查询 users 集合中出 name 字段值为 fbnoi 的记录：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> db.users.find(&#123;name: 'Tom'&#125;)</span><br><span class="line">//result</span><br><span class="line">&#123; "_id" : ObjectId("5d71cd008adec7a910058dff"), "name" : "Tom", "age" : 19, </span><br><span class="line">"gender" : "man", "friends" : [ "Lilith", "Alice" ] &#125;</span><br></pre></td></tr></table></figure></p>
+<h5 id="使用查询操作符指定条件"><a href="#使用查询操作符指定条件" class="headerlink" title="使用查询操作符指定条件"></a>使用查询操作符指定条件</h5><p>当需要用到操作符（例如‘gt’， ‘lt’， ‘in’ 等）时，可以使用以下格式添加查询条件：<br>{field1：{operator1： value1}, …}</p>
+<p>以下操作指令将查询 users 集合中所有 age 字段大于 18 的数据：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> db.users.find(&#123;age: &#123;$gt: 18&#125;&#125;)</span><br><span class="line">&#123; "_id" : ObjectId("5d71cd008adec7a910058dff"), "name" : "Tom", "age" : 19, </span><br><span class="line">"gender" : "man", "friends" : [ "Lilith", "Alice" ] &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5d71cd078adec7a910058e01"), "name" : "Ana", "age" : 20, </span><br><span class="line">"gender" : "woman", "friends" : [ "Tony" ] &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5d71cd0e8adec7a910058e02"), "name" : "Alice", "age" : 21, "gender" : "man", "friends" : [ "Lilith", "Tom" ] &#125;</span><br></pre></td></tr></table></figure></p>
+<h5 id="指定-AND-条件"><a href="#指定-AND-条件" class="headerlink" title="指定 AND 条件"></a>指定 AND 条件</h5><p>复合查默认使用 AND 连接所有的字句条件。<br>以下操作指令将查询 users 集合中所有 age 字段大于 18 的数据 ‘且’ gender 字段值为 ‘man’ 的数据：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> db.users.find(&#123;age: &#123;$gt: 18&#125;, gender: 'man'&#125;)</span><br><span class="line">&#123; "_id" : ObjectId("5d71cd008adec7a910058dff"), "name" : "Tom", "age" : 19, </span><br><span class="line">"gender" : "man", "friends" : [ "Lilith", "Alice" ] &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5d71cd0e8adec7a910058e02"), "name" : "Alice", "age" : 21, "gender" : "man", "friends" : [ "Lilith", "Tom" ] &#125;</span><br></pre></td></tr></table></figure></p>
+<h5 id="指定-OR-条件"><a href="#指定-OR-条件" class="headerlink" title="指定 OR 条件"></a>指定 OR 条件</h5><p>通过使用 \$or 操作符，你可以使用 OR逻辑连接所有的字句条件。<br>{$or: [condition1, condition2 …]}<br>以下操作指令将查询 users 集合中所有 age 字段小于 18 的数据 ‘或’ gender 字段值为 ‘woman’ 的数据：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> db.users.find(&#123;$or: [&#123;age: &#123;$lte: 17&#125;&#125;, &#123;gender: 'woman'&#125;]&#125;)</span><br><span class="line">&#123; "_id" : ObjectId("5d71cd078adec7a910058e00"), "name" : "Tony", "age" : 17, "gender" : "man", "friends" : [ "Ana" ] &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5d71cd078adec7a910058e01"), "name" : "Ana", "age" : 20, </span><br><span class="line">"gender" : "woman", "friends" : [ "Tony" ] &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5d71cd0e8adec7a910058e03"), "name" : "Lilith", "age" : 18, "gender" : "woman", "friends" : [ "Alice", "Tom" ] &#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="数组上的查询"><a href="#数组上的查询" class="headerlink" title="数组上的查询"></a>数组上的查询</h4><h5 id="精确匹配"><a href="#精确匹配" class="headerlink" title="精确匹配"></a>精确匹配</h5><p>要指定数组相等匹配，使用查询文档 { field: value } 其中 value 是匹配的数组。数组的相等匹配要求数组字段与指定的匹配数组 value 完全相符，包括数组元素的顺序。<br>以下操作指令将查询 users 集合中所有 friends 字段等于 [‘Alice’, ‘Tom’] 的数据：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> db.users.find(&#123; friends: ['Alice', 'Tom'] &#125;)</span><br><span class="line">&#123; "_id" : ObjectId("5d71cd0e8adec7a910058e03"), "name" : "Lilith", "age" : 18, "gender" : "woman", "friends" : [ "Alice", "Tom" ] &#125;</span><br></pre></td></tr></table></figure></p>
+<h5 id="匹配一个数组元素"><a href="#匹配一个数组元素" class="headerlink" title="匹配一个数组元素"></a>匹配一个数组元素</h5><p>等于匹配可以指定匹配数组中的单一元素。如果数组中至少 一个 元素包含特定的值，就可以匹配这些声明。<br>以下操作指令将查询 users 集合中所有 friends 字段包含 ‘Tom’ 的数据：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> db.users.find(&#123; friends: 'Tom' &#125;)</span><br><span class="line">&#123; "_id" : ObjectId("5d71cd0e8adec7a910058e02"), "name" : "Alice", "age" : 21, "gender" : "man", "friends" : [ "Lilith", "Tom" ] &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5d71cd0e8adec7a910058e03"), "name" : "Lilith", "age" : 18, "gender" : "woman", "friends" : [ "Alice", "Tom" ] &#125;</span><br></pre></td></tr></table></figure></p>
+<h5 id="匹配数组中的指定元素"><a href="#匹配数组中的指定元素" class="headerlink" title="匹配数组中的指定元素"></a>匹配数组中的指定元素</h5><p>等于匹配可以指定匹配数组某一特定所有或位置的元素，使用 ‘.\&lt;pos>‘<br>以下操作指令将查询 users 集合中所有 friends 字段第一个元素为 ‘Alice’ 的数据：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> db.users.find(&#123; 'friends.0': 'Alice' &#125;)</span><br><span class="line">&#123; "_id" : ObjectId("5d71cd0e8adec7a910058e03"), "name" : "Lilith", "age" : 18, "gender" : "woman", "friends" : [ "Alice", "Tom" ] &#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h3><p>mongodb提供了如下方法来更新集合中的数据：</p>
+<ul>
+<li>db.collection.updateOne()</li>
+<li>db.collection.updateMany()</li>
+<li>db.collection.replaceOne()</li>
+<li>db.collection.update()</li>
+</ul>
+<h4 id="行为表现"><a href="#行为表现" class="headerlink" title="行为表现"></a>行为表现</h4><h5 id="原子性"><a href="#原子性" class="headerlink" title="原子性"></a>原子性</h5><p>mongodb在单一文档层级上的写操作是原子的。</p>
+<h5 id="id-字段"><a href="#id-字段" class="headerlink" title="_id 字段"></a>_id 字段</h5><p>一旦设定，你不能更新 _id 字段的值，你也不能用有不同 _id 字段值的替换文档来替换已经存在的文档。</p>
+<h5 id="文档大小"><a href="#文档大小" class="headerlink" title="文档大小"></a>文档大小</h5><p>当执行更新操作增加的文档大小超过了为该文档分配的空间时。更新操作会在磁盘上重定位该文档。</p>
+<h5 id="字段顺序"><a href="#字段顺序" class="headerlink" title="字段顺序"></a>字段顺序</h5><p>MongoDB按照文档写入的顺序整理文档字段，除了 如下的情况：</p>
+<ul>
+<li>_id 字段始终是文档中的第一个字段。</li>
+<li>包括字段名称的 renaming 操作可能会导致文档中的字段重新排序。</li>
+</ul>
+<blockquote>
+<p><strong>notice:</strong> 在 2.6 版更改: 从2.6版本开始，MongoDB主动尝试保持字段在文档中的顺序。 2.6版本之前，MongoDB不会主动保持文档中的字段的顺序。</p>
+</blockquote>
+<h5 id="Upsert-选项"><a href="#Upsert-选项" class="headerlink" title="Upsert 选项"></a>Upsert 选项</h5><p>如果进行更新操作时包含 <strong>upsert : true</strong> 并且没有文档匹配指定的过滤器，那么此操作会创建一个新文档并插入它。</p>
+<h4 id="更新单个文档"><a href="#更新单个文档" class="headerlink" title="更新单个文档"></a>更新单个文档</h4><p>使用db.collection.updateOne()方法将更新集合中匹配到的第一条数据。<br>以下操作指令将更新 users 集合中第一个 age 字段为 18 的数据，并将 gender 设置为 ‘woman’：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> db.users.updateOne(</span><br><span class="line">    &#123;age: 18&#125;,</span><br><span class="line">    &#123;</span><br><span class="line">        $set: &#123; gender: 'woman'&#125;,</span><br><span class="line">        $currentDate: &#123; lastModified: true &#125;</span><br><span class="line">    &#125;</span><br><span class="line">)</span><br><span class="line">//result</span><br><span class="line">&#123; "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 0 &#125;</span><br></pre></td></tr></table></figure></p>
+<p>或者使用db.users.update()方法：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> db.users.update(</span><br><span class="line">    &#123;age: 18&#125;,</span><br><span class="line">    &#123;</span><br><span class="line">        $set: &#123; gender: 'woman'&#125;,</span><br><span class="line">        $currentDate: &#123; lastModified: true &#125;</span><br><span class="line">    &#125;</span><br><span class="line">)</span><br><span class="line">//result</span><br><span class="line">WriteResult(&#123; "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 &#125;)</span><br></pre></td></tr></table></figure></p>
+<p>其中： </p>
+<ul>
+<li>使用 $set 操作符更新 gender 字段的值为 “woman” ,</li>
+<li>使用 \$currentDate 操作符更新 lastModified 字段的值到当前日期。如果 lastModified 字段不存在， \$currentDate 会创建该字段。详情请参阅 <a href="http://www.mongoing.com/docs/reference/operator/update/currentDate.html#up._S_currentDate" target="_blank" rel="noopener">$currentDate</a>。</li>
+</ul>
+<h4 id="更新多个文档"><a href="#更新多个文档" class="headerlink" title="更新多个文档"></a>更新多个文档</h4><p>使用db.collection.updateOne()方法将更新集合中匹配到的所有数据。<br>以下操作指令将更新 users 集合中所有 gender 字段为 ‘woman’ 的数据，并将 age 设置为 18：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> db.users.updateMany(</span><br><span class="line">    &#123;gender: 'woman'&#125;,</span><br><span class="line">    &#123;</span><br><span class="line">        $set: &#123; age: 18&#125;,</span><br><span class="line">        $currentDate: &#123; lastModified: true &#125;</span><br><span class="line">    &#125;</span><br><span class="line">)</span><br><span class="line">//result</span><br><span class="line">&#123; "acknowledged" : true, "matchedCount" : 2, "modifiedCount" : 2 &#125;</span><br></pre></td></tr></table></figure></p>
+<p>或者使用db.users.update()方法并包含 <strong>multi: true</strong> 选项：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> db.users.update(</span><br><span class="line">    &#123;gender: 'woman'&#125;,</span><br><span class="line">    &#123;</span><br><span class="line">        $set: &#123; age: 18&#125;,</span><br><span class="line">        $currentDate: &#123; lastModified: true &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;multi: true&#125;</span><br><span class="line">)</span><br><span class="line">//result</span><br><span class="line">WriteResult(&#123; "nMatched" : 2, "nUpserted" : 0, "nModified" : 2 &#125;)</span><br></pre></td></tr></table></figure></p>
+<h4 id="替换文档"><a href="#替换文档" class="headerlink" title="替换文档"></a>替换文档</h4><p>使用db.collection.replaceOne()方法将匹配到的 <strong>第一个</strong> 文档替换为新文档。<br>以下操作指令将更新 users 集合中第一个 age 为 18 的数据替换：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> db.users.replaceOne(</span><br><span class="line">    &#123;age: 18&#125;,</span><br><span class="line">    &#123;name: 'Nisa', age: 19, gender: 'woman', friends:[]&#125;</span><br><span class="line">)</span><br><span class="line">//result</span><br><span class="line">&#123; "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 &#125;</span><br></pre></td></tr></table></figure></p>
+<p>或者使用db.collection.update()方法<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> db.users.update(</span><br><span class="line">    &#123;age: 18&#125;,</span><br><span class="line">    &#123;name: 'Nisa', age: 19, gender: 'woman', friends:[]&#125;</span><br><span class="line">)</span><br><span class="line">//result</span><br><span class="line">WriteResult(&#123; "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 &#125;)</span><br></pre></td></tr></table></figure></p>
+<h3 id="删除文档"><a href="#删除文档" class="headerlink" title="删除文档"></a>删除文档</h3><p>mongodb提供了如下方法来删除集合中的数据：</p>
+<ul>
+<li>db.collection.remove()</li>
+<li>db.collection.deleteOne()</li>
+<li>db.collection.deleteMany()</li>
+</ul>
+<h4 id="行为表现-1"><a href="#行为表现-1" class="headerlink" title="行为表现"></a>行为表现</h4><h5 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h5><p>删除操作并不会删除索引，即使将集合中所有的数据删除。</p>
+<h5 id="原子性-1"><a href="#原子性-1" class="headerlink" title="原子性"></a>原子性</h5><p>mongodb在单一文档层级上的写操作是原子的。</p>
+<h4 id="删除匹配文档"><a href="#删除匹配文档" class="headerlink" title="删除匹配文档"></a>删除匹配文档</h4><p>使用db.collection.deleteMany()或 db.collection.remove()方法并指定筛选条件将删除集合中所有满足条件的数据。<br>以下数据将删除users集合中age小于18的记录：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> db.users.deleteMany(&#123;age: &#123;$lt: 18&#125;&#125;)</span><br><span class="line">&#123; "acknowledged" : true, "deletedCount" : 1 &#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="删除所有文档"><a href="#删除所有文档" class="headerlink" title="删除所有文档"></a>删除所有文档</h4><p>要想从集合中删除所有文档,传递一个空的筛选条件给 db.collection.deleteMany()或 db.collection.remove()方法。<br>以下操作将删除users下所有记录：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> db.users.deleteMany(&#123;&#125;)</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p><strong>notice:</strong> </p>
+<ul>
+<li>要想从一个集合里删除所有文档，使用 drop() 方法删除整个集合,包括索引然后重建该集合和索引或许会更高效。</li>
+<li>对于大量的删除操作，把你想要保留的文档复制到一个新的集合然后使用 db.collection.drop() 方法删除原集合或许会更高效。</li>
+</ul>
+</blockquote>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                    
+                        <li class="next">
+                            <a href="/2019/09/05/linux下安装mongodb.html" data-toggle="tooltip" data-placement="top" title="linux下安装mongodb">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+    
+      <aside id="sidebar">
+        
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#创建数据库"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">创建数据库</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#创建集合"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">创建集合</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#插入文档"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">插入文档</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#insertOne"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">insertOne</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#insertMany"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">insertMany</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#insert"><span class="toc-nav-number">3.3.</span> <span class="toc-nav-text">insert</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#查询文档"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">查询文档</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#集合中的所有文档"><span class="toc-nav-number">4.1.</span> <span class="toc-nav-text">集合中的所有文档</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#指定过滤条件"><span class="toc-nav-number">4.2.</span> <span class="toc-nav-text">指定过滤条件</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#指定等于条件"><span class="toc-nav-number">4.2.1.</span> <span class="toc-nav-text">指定等于条件</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#使用查询操作符指定条件"><span class="toc-nav-number">4.2.2.</span> <span class="toc-nav-text">使用查询操作符指定条件</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#指定-AND-条件"><span class="toc-nav-number">4.2.3.</span> <span class="toc-nav-text">指定 AND 条件</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#指定-OR-条件"><span class="toc-nav-number">4.2.4.</span> <span class="toc-nav-text">指定 OR 条件</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#数组上的查询"><span class="toc-nav-number">4.3.</span> <span class="toc-nav-text">数组上的查询</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#精确匹配"><span class="toc-nav-number">4.3.1.</span> <span class="toc-nav-text">精确匹配</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#匹配一个数组元素"><span class="toc-nav-number">4.3.2.</span> <span class="toc-nav-text">匹配一个数组元素</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#匹配数组中的指定元素"><span class="toc-nav-number">4.3.3.</span> <span class="toc-nav-text">匹配数组中的指定元素</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#更新"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">更新</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#行为表现"><span class="toc-nav-number">5.1.</span> <span class="toc-nav-text">行为表现</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#原子性"><span class="toc-nav-number">5.1.1.</span> <span class="toc-nav-text">原子性</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#id-字段"><span class="toc-nav-number">5.1.2.</span> <span class="toc-nav-text">_id 字段</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#文档大小"><span class="toc-nav-number">5.1.3.</span> <span class="toc-nav-text">文档大小</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#字段顺序"><span class="toc-nav-number">5.1.4.</span> <span class="toc-nav-text">字段顺序</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#Upsert-选项"><span class="toc-nav-number">5.1.5.</span> <span class="toc-nav-text">Upsert 选项</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#更新单个文档"><span class="toc-nav-number">5.2.</span> <span class="toc-nav-text">更新单个文档</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#更新多个文档"><span class="toc-nav-number">5.3.</span> <span class="toc-nav-text">更新多个文档</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#替换文档"><span class="toc-nav-number">5.4.</span> <span class="toc-nav-text">替换文档</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#删除文档"><span class="toc-nav-number">6.</span> <span class="toc-nav-text">删除文档</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#行为表现-1"><span class="toc-nav-number">6.1.</span> <span class="toc-nav-text">行为表现</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#索引"><span class="toc-nav-number">6.1.1.</span> <span class="toc-nav-text">索引</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#原子性-1"><span class="toc-nav-number">6.1.2.</span> <span class="toc-nav-text">原子性</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#删除匹配文档"><span class="toc-nav-number">6.2.</span> <span class="toc-nav-text">删除匹配文档</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#删除所有文档"><span class="toc-nav-number">6.3.</span> <span class="toc-nav-text">删除所有文档</span></a></li></ol></li></ol>
+        
+        </div>
+      </aside>
+    
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#mongodb" title="mongodb">mongodb</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="#" target="_blank">It Helps SEO</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/fbnoi">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; FBnoI 2019 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    re-Ported by <a href="http://fbnoi.github.io">FBnoI</a> | 
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="91px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=YenYuHsuan&repo=hexo-theme-beantech&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("http://fbnoi.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="http://fbnoi.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
