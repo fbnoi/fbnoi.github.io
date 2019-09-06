@@ -147,14 +147,14 @@
 
                         
                         <li>
-                            <a href="/archive/">Archives</a>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
+                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
@@ -217,7 +217,38 @@
 <p>运行以下指令可以查看所有可用的数据库<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> shows dbs</span><br><span class="line">admin   0.000GB</span><br><span class="line">config  0.000GB</span><br><span class="line">local   0.000GB</span><br></pre></td></tr></table></figure></p>
 <p>使用指令：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> use &lt;database&gt;</span><br></pre></td></tr></table></figure></p>
 <p>来切换数据库，你可以切换到一个不存在的数据库，这种操作是被允许的。但是这个数据库并没有被创建，只有在你向这个数据库存储数据时，此数据库才会被创建。</p>
-<h3 id="创建集合"><a href="#创建集合" class="headerlink" title="创建集合"></a>创建集合</h3><p>使用 <strong>db.createCollection</strong> 方法创建集合，createCollection可以接受两个参数，第一个参数是创建集合的名称，第二个是创建集合时的选项：<br>| 字段 | 类型 | 描述 |<br>| —- | —- | —- |<br>| capped | 布尔 |（可选）如果为 true，则创建固定集合。固定集合是指有着固定大小的集合，当达到最大值时，它会自动覆盖最早的文档。当该值为 true 时，必须指定 size 参数。|<br>| autoIndexId | 布尔 | （可选）如为 true，自动在 _id 字段创建索引。默认为 false。|<br>| size | 数值 | （可选）为固定集合指定一个最大值（以字节计）。如果 capped 为 true，也需要指定该字段。<br>| max | 数值 | （可选）指定固定集合中包含文档的最大数量。 |</p>
+<h3 id="创建集合"><a href="#创建集合" class="headerlink" title="创建集合"></a>创建集合</h3><p>使用 <strong>db.createCollection</strong> 方法创建集合，createCollection可以接受两个参数，第一个参数是创建集合的名称，第二个是创建集合时的选项：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">字段</th>
+<th style="text-align:left">类型</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">capped</td>
+<td style="text-align:left">布尔</td>
+<td style="text-align:left">（可选）如果为 true，则创建固定集合。固定集合是指有着固定大小的集合，当达到最大值时，它会自动覆盖最早的文档。当该值为 true 时，必须指定 size 参数。</td>
+</tr>
+<tr>
+<td style="text-align:left">autoIndexId</td>
+<td style="text-align:left">布尔</td>
+<td style="text-align:left">（可选）如为 true，自动在 _id 字段创建索引。默认为 false。</td>
+</tr>
+<tr>
+<td style="text-align:left">size</td>
+<td style="text-align:left">数值</td>
+<td style="text-align:left">（可选）为固定集合指定一个最大值（以字节计）。如果 capped 为 true，也需要指定该字段。</td>
+</tr>
+<tr>
+<td style="text-align:left">max</td>
+<td style="text-align:left">数值</td>
+<td style="text-align:left">（可选）指定固定集合中包含文档的最大数量。</td>
+</tr>
+</tbody>
+</table>
 <p>以下指令将创建一个命名为 <strong>users</strong> 的集合<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> db.createCollection('users', &#123;&#125;)</span><br></pre></td></tr></table></figure></p>
 <h3 id="插入文档"><a href="#插入文档" class="headerlink" title="插入文档"></a>插入文档</h3><blockquote>
 <p><strong>notice:</strong> mongodb中所有的写操作在单一文档层级上是原子的.</p>
