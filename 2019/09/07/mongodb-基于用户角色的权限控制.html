@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content>
+    <meta name="keyword" content>
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          mongodb 基于用户角色的权限控制 - FBnoI | Blog
+        
+    </title>
+
+    <link rel="canonical" href="http://fbnoi.github.io/2019/09/07/mongodb-基于用户角色的权限控制.html">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('')
+            /*post*/
+        
+    }
+    
+</style>
+
+<header class="intro-header" >
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#mongodb" title="mongodb">mongodb</a>
+                            
+                        </div>
+                        <h1>mongodb 基于用户角色的权限控制</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by FBnoI on
+                            2019-09-07
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">FBnoI</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <p>mongodb支持基于角色的访问控制（RBAC）来管理对mongodb系统的访问。一个用户可以被授权一个或者多个角色以决定该用户对数据库资源和操作的访问权限。在权限以外，用户是无法访问系统的。</p>
+<h3 id="内建角色"><a href="#内建角色" class="headerlink" title="内建角色"></a>内建角色</h3><p>mongodb提供内置角色，提供数据库系统中常用的不同访问级别。每个数据库中都存在内置 <strong>数据库用户角色</strong> 和 <strong>数据库管理角色角色</strong> 。</p>
+<h4 id="数据库用户角色"><a href="#数据库用户角色" class="headerlink" title="数据库用户角色"></a>数据库用户角色</h4><p>每个数据库都包含以下角色：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">角色</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><a href="http://www.mongoing.com/docs/reference/built-in-roles.html#read" target="_blank" rel="noopener">read</a></td>
+<td style="text-align:left">提供读取所有非系统集合和以下系统集合上的数据的功能：system.indexes， system.js和system.namespaces。</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="http://www.mongoing.com/docs/reference/built-in-roles.html#readWrite" target="_blank" rel="noopener">readWrite</a></td>
+<td style="text-align:left">提供read角色的所有权限以及修改所有非系统集合和system.js集合的数据的能力。</td>
+</tr>
+</tbody>
+</table>
+<h4 id="数据库管理角色"><a href="#数据库管理角色" class="headerlink" title="数据库管理角色"></a>数据库管理角色</h4><p>每个数据库都包含以下数据库管理角色：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">角色</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><a href="http://www.mongoing.com/docs/reference/built-in-roles.html#dbAdmin" target="_blank" rel="noopener">dbAdmin</a></td>
+<td style="text-align:left">提供执行管理任务的功能，例如与架构相关的任务，索引编制，收集统计信息。此角色不提供 用户和角色管理 权限。</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="http://www.mongoing.com/docs/reference/built-in-roles.html#userAdmin" target="_blank" rel="noopener">userAdmin</a></td>
+<td style="text-align:left">提供在当前数据库上创建和修改角色和用户的功能。由于userAdmin角色允许用户向任何用户（包括他们自己）授予任何权限，因此该角色还间接提供对数据库的超级用户访问权限，或者，如果作用于 admin 数据库，则提供对群集的访问权限。</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="http://www.mongoing.com/docs/reference/built-in-roles.html#dbOwner" target="_blank" rel="noopener">dbOwner</a></td>
+<td style="text-align:left">提供对数据库执行任何管理操作的功能。此角色组合了readWrite，dbAdmin和 userAdmin角色授予的权限 。</td>
+</tr>
+</tbody>
+</table>
+<h4 id="群集管理角色"><a href="#群集管理角色" class="headerlink" title="群集管理角色"></a>群集管理角色</h4><p>admin 数据库包括以下角色用于管理整个集群而不是一个特定的数据库。这些角色包括但不限于副本集和分片集群的管理功能。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">角色</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><a href="http://www.mongoing.com/docs/reference/built-in-roles.html#clusterAdmin" target="_blank" rel="noopener">clusterAdmin</a></td>
+<td style="text-align:left">提供最高级的集群管理访问。此角色组合了clusterManager， clusterMonitor和hostManager角色授予的权限。此外，该角色还提供了dropDatabase操作。</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="http://www.mongoing.com/docs/reference/built-in-roles.html#clusterManager" target="_blank" rel="noopener">clusterManager</a></td>
+<td style="text-align:left">提供群集上的管理和监视操作。 具有此角色的用户可以分别访问分片和复制中使用的配置和本地数据库。</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="http://www.mongoing.com/docs/reference/built-in-roles.html#clusterMonitor" target="_blank" rel="noopener">clusterMonitor</a></td>
+<td style="text-align:left">提供对监视工具的只读访问权限</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="http://www.mongoing.com/docs/reference/built-in-roles.html#hostManager" target="_blank" rel="noopener">hostManager</a></td>
+<td style="text-align:left">提供监视和管理服务器的功能。</td>
+</tr>
+</tbody>
+</table>
+<h4 id="备份和恢复角色"><a href="#备份和恢复角色" class="headerlink" title="备份和恢复角色"></a>备份和恢复角色</h4><p>admin 数据库包括用于备份和恢复数据的以下角色：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">角色</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><a href="http://www.mongoing.com/docs/reference/built-in-roles.html#backup" target="_blank" rel="noopener">backup</a></td>
+<td style="text-align:left">提供备份数据所需的权限</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="http://www.mongoing.com/docs/reference/built-in-roles.html#restore" target="_blank" rel="noopener">restore</a></td>
+<td style="text-align:left">提供使用mongorestore还原数据所需的权限，而不使用–oplogReplay选项或不使用system.profile集合数据。</td>
+</tr>
+</tbody>
+</table>
+<h4 id="全数据库角色"><a href="#全数据库角色" class="headerlink" title="全数据库角色"></a>全数据库角色</h4><p>admin数据库提供以下角色，这些角色适用于mongod实例中除本地和配置数据库之外的所有数据库，并且大致相当于它们的单数据库等效项：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">角色</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><a href="http://www.mongoing.com/docs/reference/built-in-roles.html#readAnyDatabase" target="_blank" rel="noopener">readAnyDatabase</a></td>
+<td style="text-align:left">提供与read相同的只读权限，但它适用于除集群中的本地和配置数据库之外的所有权限。 该角色还在整个群集上提供listDatabases操作。</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="http://www.mongoing.com/docs/reference/built-in-roles.html#readWriteAnyDatabase" target="_blank" rel="noopener">readWriteAnyDatabase</a></td>
+<td style="text-align:left">提供与readWrite相同的读写权限，但它适用于集群中除本地和配置数据库之外的所有数据库。 该角色还在整个群集上提供listDatabases操作。</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="http://www.mongoing.com/docs/reference/built-in-roles.html#userAdminAnyDatabase" target="_blank" rel="noopener">userAdminAnyDatabase</a></td>
+<td style="text-align:left">提供与userAdmin相同的用户管理操作访问权限，但它适用于群集中除本地和配置数据库之外的所有数据库。由于userAdminAnyDatabase角色允许用户向任何用户（包括他们自己）授予任何权限，因此该角色还间接提供超级用户访问权限。</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="http://www.mongoing.com/docs/reference/built-in-roles.html#dbAdminAnyDatabase" target="_blank" rel="noopener">dbAdminAnyDatabase</a></td>
+<td style="text-align:left">提供与dbAdmin相同的数据库管理操作访问权限，但它适用于除集群中的本地和配置数据库之外的所有数据库。 该角色还在整个群集上提供listDatabases操作。</td>
+</tr>
+</tbody>
+</table>
+<h4 id="超级用户角色"><a href="#超级用户角色" class="headerlink" title="超级用户角色"></a>超级用户角色</h4><p>以下角色为所有资源提供完全权限：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">角色</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><a href="http://www.mongoing.com/docs/reference/built-in-roles.html#root" target="_blank" rel="noopener">root</a></td>
+<td style="text-align:left">提供对readWriteAnyDatabase，dbAdminAnyDatabase，userAdminAnyDatabase，clusterAdmin，restore和backup组合的操作和所有资源的访问。</td>
+</tr>
+</tbody>
+</table>
+<h4 id="内部角色"><a href="#内部角色" class="headerlink" title="内部角色"></a>内部角色</h4><table>
+<thead>
+<tr>
+<th style="text-align:left">角色</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><a href="http://www.mongoing.com/docs/reference/built-in-roles.html#__system" target="_blank" rel="noopener">__system</a></td>
+<td style="text-align:left">提供对数据库中的任何对象执行任何操作的权限。除特殊情况外，请勿将此角色分配给表示应用程序或人员管理员的用户对象。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="用户自定义角色"><a href="#用户自定义角色" class="headerlink" title="用户自定义角色"></a>用户自定义角色</h3><p>有时mongodb内置的角色并不能满足业务需求，这时我们可以自己创建角色。</p>
+<h4 id="用户管理接口"><a href="#用户管理接口" class="headerlink" title="用户管理接口"></a>用户管理接口</h4><p>可以使用db.createRole()方法创建自定义角色，在创建自定义角色之前，请确保当前用户能进行 createRole 操作和 grantRole 操作。<br>需要注意的是，除了在 admin 数据库中创建的角色之外，角色只能包含适用于其数据库的权限，并且只能从其数据库中的其他角色继承。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> use admin</span><br><span class="line"><span class="meta">&gt;</span> db.createRole(</span><br><span class="line">    &#123;</span><br><span class="line">        role: "myRole",</span><br><span class="line">        privileges: [</span><br><span class="line">            &#123; resource: &#123; cluster: true &#125;, actions: [ "find" ] &#125;,</span><br><span class="line">        ],</span><br><span class="line">        roles: []</span><br><span class="line">    &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
+<p>上述操作将创建一个myRole角色，此角色能使用 find 动作。</p>
+<blockquote>
+<p><strong>notice:</strong> 更多的 action 请参考<a href="http://www.mongoing.com/docs/reference/privilege-actions.html" target="_blank" rel="noopener">http://www.mongoing.com/docs/reference/privilege-actions.html</a></p>
+</blockquote>
+<h4 id="修改用户角色"><a href="#修改用户角色" class="headerlink" title="修改用户角色"></a>修改用户角色</h4><p>使用 db.revokeRolesFromUser() 方法撤销用户已存在的角色：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> use fbnoi</span><br><span class="line"><span class="meta">&gt;</span> db.revokeRolesFromUser(</span><br><span class="line">    "zhangs",</span><br><span class="line">    [</span><br><span class="line">      &#123; role: "clusterAdmin", db: "admin" &#125;</span><br><span class="line">    ]</span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
+<p>上述操作将删除 zhangs 在 admin 数据库的 clusterAdmin 角色。<br>使用 db.grantRolesToUser()<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> use fbnoi</span><br><span class="line"><span class="meta">&gt;</span> db.grantRolesToUser(</span><br><span class="line">    "zhangs",</span><br><span class="line">    [</span><br><span class="line">      &#123; role: "myRole", db: "fbnoi" &#125;</span><br><span class="line">    ]</span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
+<p>上述操作将为 zhangs 在 fbnoi 数据库添加 myRole 角色。</p>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                    
+                        <li class="next">
+                            <a href="/2019/09/07/mongodb-用户认证.html" data-toggle="tooltip" data-placement="top" title="mongodb 用户认证">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+    
+      <aside id="sidebar">
+        
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#内建角色"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">内建角色</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#数据库用户角色"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">数据库用户角色</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#数据库管理角色"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">数据库管理角色</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#群集管理角色"><span class="toc-nav-number">1.3.</span> <span class="toc-nav-text">群集管理角色</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#备份和恢复角色"><span class="toc-nav-number">1.4.</span> <span class="toc-nav-text">备份和恢复角色</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#全数据库角色"><span class="toc-nav-number">1.5.</span> <span class="toc-nav-text">全数据库角色</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#超级用户角色"><span class="toc-nav-number">1.6.</span> <span class="toc-nav-text">超级用户角色</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#内部角色"><span class="toc-nav-number">1.7.</span> <span class="toc-nav-text">内部角色</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#用户自定义角色"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">用户自定义角色</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#用户管理接口"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">用户管理接口</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#修改用户角色"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">修改用户角色</span></a></li></ol></li></ol>
+        
+        </div>
+      </aside>
+    
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#mongodb" title="mongodb">mongodb</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="#" target="_blank">It Helps SEO</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/fbnoi">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; FBnoI 2019 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    re-Ported by <a href="http://fbnoi.github.io">FBnoI</a> | 
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="91px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=YenYuHsuan&repo=hexo-theme-beantech&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("http://fbnoi.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+
+<!-- Baidu Tongji -->
+
+<script>
+    // dynamic User by Hux
+    var _baId = '9757717a117c3efb8b4a4c7cb73bc46e';
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="http://fbnoi.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
