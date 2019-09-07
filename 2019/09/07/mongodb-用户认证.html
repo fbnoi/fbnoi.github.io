@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content>
+    <meta name="keyword" content>
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          mongodb 用户认证 - FBnoI | Blog
+        
+    </title>
+
+    <link rel="canonical" href="http://fbnoi.github.io/2019/09/07/mongodb-用户认证.html">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('')
+            /*post*/
+        
+    }
+    
+</style>
+
+<header class="intro-header" >
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#mongodb" title="mongodb">mongodb</a>
+                            
+                        </div>
+                        <h1>mongodb 用户认证</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by FBnoI on
+                            2019-09-07
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">FBnoI</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <p>mongodb提供了基于用户名密码的认证和用户角色的访问控制。用户认证和访问控制是独立而又相互关联的两部分。</p>
+<h4 id="添加用户"><a href="#添加用户" class="headerlink" title="添加用户"></a>添加用户</h4><p>mongodb提供了 <strong>db.createUser()</strong> 方法来创建用户。该方法接收两个参数。第一个参数是要创建的用户的信息，第二个参数是一个可选参数，用来设置写安全应答。<br>一个用户的属性如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Field</th>
+<th style="text-align:left">Type</th>
+<th style="text-align:left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">user</td>
+<td style="text-align:left">string</td>
+<td style="text-align:left">用户名</td>
+</tr>
+<tr>
+<td style="text-align:left">pwd</td>
+<td style="text-align:left">string</td>
+<td style="text-align:left">密码</td>
+</tr>
+<tr>
+<td style="text-align:left">roles</td>
+<td style="text-align:left">array</td>
+<td style="text-align:left">用户角色</td>
+</tr>
+<tr>
+<td style="text-align:left">customData</td>
+<td style="text-align:left">document</td>
+<td style="text-align:left">（可选）扩展信息，可自定义</td>
+</tr>
+</tbody>
+</table>
+<p>其格式如下：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123; user: "&lt;name&gt;",</span><br><span class="line">  pwd: "&lt;cleartext password&gt;",</span><br><span class="line">  roles: [</span><br><span class="line">    &#123; role: "&lt;role&gt;", db: "&lt;database&gt;" &#125; | "&lt;role&gt;",</span><br><span class="line">    ...</span><br><span class="line">  ],</span><br><span class="line">  customData: &#123; &lt;any information&gt; &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在role中，<strong>{ role: “\&lt;role>“, db: “\&lt;database>“ }</strong> db字段将制定该角色适用的数据库，这表示在其他数据库中该角色将不起作用。你也可以直接设置 <strong>role</strong> 而不指定 <strong>db</strong>，如此该角色适用于当前的数据库。<br>例如：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">use fbnoi</span><br><span class="line">db.createUser(</span><br><span class="line">	&#123;</span><br><span class="line">		user: "user1",</span><br><span class="line">		pwd: "123456",</span><br><span class="line">        customData: &#123; realname: '张三' &#125;,</span><br><span class="line">		roles: [</span><br><span class="line">			&#123; role: "clusterAdmin", db: "admin" &#125;,</span><br><span class="line">			&#123; role: "readAnyDatabase", db: "admin" &#125;,</span><br><span class="line">            "readWrite"</span><br><span class="line">		] </span><br><span class="line">	&#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
+<p>将在 fbnoi 数据库创建一个用户名为user1的用户，真实名字为‘张三’，在 admin 数据库拥有 <strong>clusterAdmin</strong>、<strong>readAnyDatabase</strong> 角色，在 fbnoi 数据库拥有 <strong>readWrite</strong> 角色。</p>
+<blockquote>
+<p><strong>notice:</strong> 在数据库中创建的第一个用户应该是具有管理其他用户的权限的用户管理员。</p>
+</blockquote>
+<h4 id="集中保存用户数据"><a href="#集中保存用户数据" class="headerlink" title="集中保存用户数据"></a>集中保存用户数据</h4><p>当创建用户时，mongodb将在admin数据库保存数据，这个数据库用来集中保存用户的认证信息。<br>一个用户可以在不同的数据库拥有不同的权限，如上例所示，用户不仅在 admin 数据库 有两个角色，而且在 fbnoi 数据库拥有另一个角色，你也可以更新用户角色信息已添加更多数据库权限。<br>你可以查询在admin中已经存在的用户：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> use admin</span><br><span class="line"><span class="meta">&gt;</span> db.getCollection('system.users').find(&#123;&#125;)</span><br><span class="line">&#123;</span><br><span class="line">        "_id" : "fbnoi.user1",</span><br><span class="line">        "userId" : UUID("950df12f-5ec4-4ba9-a80e-99dfadb89305"),</span><br><span class="line">        "user" : "user1",</span><br><span class="line">        "db" : "fbnoi",</span><br><span class="line">        "credentials" : &#123;</span><br><span class="line">                "SCRAM-SHA-1" : &#123;</span><br><span class="line">                        "iterationCount" : 10000,</span><br><span class="line">                        "salt" : "aIcsf+UweQHJvJw6fw6oUA==",</span><br><span class="line">                        "storedKey" : "82WFY0ENAJhgiSxCbPEUySCEDd4=",       </span><br><span class="line">                        "serverKey" : "lNtVoLpLzhvdZhqSVP1Z20tkN1M="        </span><br><span class="line">                &#125;,</span><br><span class="line">                "SCRAM-SHA-256" : &#123;</span><br><span class="line">                        "iterationCount" : 15000,</span><br><span class="line">                        "salt" : "h5DJFZrEmJPZ/XQIT0G6H0iVHa3yzTLRt8g+xg==",                        "storedKey" : "tKsUmMuMZnHigLS8TGh2vKlaLiK671qAFRLCPWEtu3s=",</span><br><span class="line">                        "serverKey" : "FPzd6nnG01bXiiLfUd/htGd+EI9G9354EPUKztSOS2U="</span><br><span class="line">                &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        "customData" : &#123;</span><br><span class="line">                "realname" : "张三"</span><br><span class="line">        &#125;,</span><br><span class="line">        "roles" : [</span><br><span class="line">                &#123;</span><br><span class="line">                        "role" : "clusterAdmin",</span><br><span class="line">                        "db" : "admin"</span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                        "role" : "readAnyDatabase",</span><br><span class="line">                        "db" : "admin"</span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                        "role" : "readWrite",</span><br><span class="line">                        "db" : "fbnoi"</span><br><span class="line">                &#125;</span><br><span class="line">        ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以发现 <strong>_id</strong> 字段使用数据库名和用户名组合标识，这意味着，如果两个用户有相同的用户名和不同的数据库，则两个用户是相互独立的。如果你想让一个用户名拥有不同数据库的操作权限，应该通过角色来控制，而不是用相同的用户名在不同的数据库创建用户。</p>
+<h4 id="用户管理员"><a href="#用户管理员" class="headerlink" title="用户管理员"></a>用户管理员</h4><p>在启用验证之前，请确保admin数据库中存在具有 <strong>userAdmin</strong> 或者 <strong>userAdminAnyDatabase</strong> 角色的用户，启用验证之后，我们将通过该用户创建并管理新的用户。<br>你可已在启用验证之前创建用户管理员：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> use admin</span><br><span class="line"><span class="meta">&gt;</span> db.createUser(</span><br><span class="line">  &#123;</span><br><span class="line">    user: "fbnoi",</span><br><span class="line">    pwd: "123456",</span><br><span class="line">    roles: [ &#123; role: "userAdminAnyDatabase", db: "admin" &#125; ]</span><br><span class="line">  &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
+<h4 id="开启验证"><a href="#开启验证" class="headerlink" title="开启验证"></a>开启验证</h4><p>在mongodb上部署访问控制将强制要求用户进行验证。用户验证之后，只能进行用户在选定数据库上的角色允许的操作。你可以在启动mongodb时通过 <strong>–auth</strong> 来开启验证，我更推荐修改配置文件来启用用户认证。<br>在你的配置文件中添加以下信息来开启验证：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">security:</span></span><br><span class="line"><span class="attr">  authorization:</span> <span class="string">'enabled'</span></span><br></pre></td></tr></table></figure></p>
+<p>修改保存之后需要重启mongodb来保证配置生效。开启认证之后你有两种方式来认证用户：</p>
+<ol>
+<li><p>在连接mongodb时添加认证选项，例如-u，-p， - authenticationDatabase，</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> mongo --port 27017 -u "fbnoi" -p "123456" --authenticationDatabase "admin"</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>先连接到mongodb，然后使用 db.auth() 方法认证用户。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> use admin</span><br><span class="line"><span class="meta">&gt;</span> db.auth("fbnoi", "123456" )</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h4 id="创建用户"><a href="#创建用户" class="headerlink" title="创建用户"></a>创建用户</h4><p>使用用户管理员账号认证连接之后，就可以根据需要创建新的用户。用户管理员只有创建和管理用户的权限，如果你想通过这个账号进行其他操作（例如读写），mongodb将会返回一个错误：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Error: error: &#123;</span><br><span class="line">        "ok" : 0,</span><br><span class="line">        "errmsg" : "not authorized on fbnoi to execute command &#123; find: \"users\", filter: &#123;&#125;, lsid: &#123; id: UUID(\"379d70db-4c2e-4ace-9533-fa8e114a2267\") &#125;, $db: \"fbnoi\" &#125;",</span><br><span class="line">        "code" : 13,</span><br><span class="line">        "codeName" : "Unauthorized"</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>使用db.createUser()方法创建用户：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> use fbnoi</span><br><span class="line"><span class="meta">&gt;</span> db.createUser(</span><br><span class="line">  &#123;</span><br><span class="line">    user: "zhangs",</span><br><span class="line">    pwd: "123456",</span><br><span class="line">    roles: [ &#123; role: "readWrite", db: "fbnoi" &#125; ]</span><br><span class="line">  &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
+<p>以上指令将在 fbnoi 数据库上创建 zhangs 用户，该用户对 fbnoi 数据库有读写权限。</p>
+<blockquote>
+<p><strong>notice:</strong> 你创建用户的数据库称为该用户的认证数据库（上例中 zhangs 用户的认证数据库为 fbnoi ）。虽然用户会认证到认证数据库中，但是用户依然可以拥有其他数据库的权限。</p>
+</blockquote>
+<p>使用 zhangs 用户认证连接，你将获取到 fbnoi 数据库的读写权限：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> use fbnoi</span><br><span class="line"><span class="meta">&gt;</span> db.auth('zhangs', '123456')</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p><strong>notice:</strong> 请勿在同一个连接中认证多个用户。</p>
+</blockquote>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                    
+                        <li class="next">
+                            <a href="/2019/09/06/mongodb-CRUD操作.html" data-toggle="tooltip" data-placement="top" title="mongodb CRUD操作">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+    
+      <aside id="sidebar">
+        
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#添加用户"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">添加用户</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#集中保存用户数据"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">集中保存用户数据</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#用户管理员"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">用户管理员</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#开启验证"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">开启验证</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#创建用户"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">创建用户</span></a></li></ol>
+        
+        </div>
+      </aside>
+    
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#mongodb" title="mongodb">mongodb</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="#" target="_blank">It Helps SEO</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/fbnoi">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; FBnoI 2019 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    re-Ported by <a href="http://fbnoi.github.io">FBnoI</a> | 
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="91px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=YenYuHsuan&repo=hexo-theme-beantech&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("http://fbnoi.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+
+<!-- Baidu Tongji -->
+
+<script>
+    // dynamic User by Hux
+    var _baId = '9757717a117c3efb8b4a4c7cb73bc46e';
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="http://fbnoi.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
