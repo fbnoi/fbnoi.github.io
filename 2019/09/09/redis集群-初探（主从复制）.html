@@ -14,11 +14,11 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          redis 编译安装 - FBnoI | Blog
+          redis集群初探（主从复制） - FBnoI | Blog
         
     </title>
 
-    <link rel="canonical" href="http://fbnoi.github.io/2019/09/04/redis编译安装.html">
+    <link rel="canonical" href="http://fbnoi.github.io/2019/09/09/redis集群-初探（主从复制）.html">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -89,11 +89,11 @@
                               <a class="tag" href="/tags/#redis" title="redis">redis</a>
                             
                         </div>
-                        <h1>redis 编译安装</h1>
+                        <h1>redis集群初探（主从复制）</h1>
                         <h2 class="subheading"></h2>
                         <span class="meta">
                             Posted by FBnoI on
-                            2019-09-04
+                            2019-09-09
                         </span>
                     </div>
                 
@@ -210,14 +210,25 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <h3 id="make和gcc"><a href="#make和gcc" class="headerlink" title="make和gcc"></a>make和gcc</h3><p>编译安装redis需要用到make和gcc工具，请确保已经正确安装make和gcc，运行命令查看gcc是否安装<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> gcc -v</span><br></pre></td></tr></table></figure></p>
-<h3 id="编译安装Redis"><a href="#编译安装Redis" class="headerlink" title="编译安装Redis"></a>编译安装Redis</h3><p>前往 <a href="http://redis.io/download" target="_blank" rel="noopener">http://redis.io/download</a> 下载最新稳定版本的redis压缩文件，当前的版本为5.0.5。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> wget http://download.redis.io/releases/redis-5.0.5.tar.gz</span><br></pre></td></tr></table></figure></p>
-<p>解压并进入redis文件夹:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> tar -zxvf redis-5.0.5.tar.gz</span><br><span class="line"><span class="meta">&gt;</span> cd redis-5.0.5</span><br></pre></td></tr></table></figure></p>
-<p>运行以下命令后，进入src文件夹，会发现两个可运行文件redis-server，redis-cli。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> make</span><br></pre></td></tr></table></figure></p>
-<h3 id="运行Redis"><a href="#运行Redis" class="headerlink" title="运行Redis"></a>运行Redis</h3><p>进入src文件夹运行命令：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> ./redis-server</span><br></pre></td></tr></table></figure></p>
-<p>如果出现以下界面，说明redis已经安装成功：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">8054:C 03 Sep 2019 20:01:27.594 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo</span><br><span class="line">8054:C 03 Sep 2019 20:01:27.594 # Redis version=5.0.5, bits=64, commit=00000000, modified=0, pid=8054, just started</span><br><span class="line">8054:C 03 Sep 2019 20:01:27.594 # Warning: no config file specified, using the default config. In order to specify a config file use ./redis-server /path/to/redis.conf</span><br><span class="line">8054:M 03 Sep 2019 20:01:27.596 * Increased maximum number of open files to 10032 (it was originally set to 1024).</span><br><span class="line">                _._                                                  </span><br><span class="line">           _.-``__ ''-._                                             </span><br><span class="line">      _.-``    `.  `_.  ''-._           Redis 5.0.5 (00000000/0) 64 bit</span><br><span class="line">  .-`` .-```.  ```\/    _.,_ ''-._                                   </span><br><span class="line"> (    '      ,       .-`  | `,    )     Running in standalone mode</span><br><span class="line"> |`-._`-...-` __...-.``-._|'` _.-'|     Port: 6379</span><br><span class="line"> |    `-._   `._    /     _.-'    |     PID: 8054</span><br><span class="line">  `-._    `-._  `-./  _.-'    _.-'                                   </span><br><span class="line"> |`-._`-._    `-.__.-'    _.-'_.-'|                                  </span><br><span class="line"> |    `-._`-._        _.-'_.-'    |           http://redis.io        </span><br><span class="line">  `-._    `-._`-.__.-'_.-'    _.-'                                   </span><br><span class="line"> |`-._`-._    `-.__.-'    _.-'_.-'|                                  </span><br><span class="line"> |    `-._`-._        _.-'_.-'    |                                  </span><br><span class="line">  `-._    `-._`-.__.-'_.-'    _.-'                                   </span><br><span class="line">      `-._    `-.__.-'    _.-'                                       </span><br><span class="line">          `-._        _.-'                                           </span><br><span class="line">              `-.__.-'                                               </span><br><span class="line"></span><br><span class="line">8054:M 03 Sep 2019 20:01:27.600 # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.</span><br><span class="line">8054:M 03 Sep 2019 20:01:27.600 # Server initialized</span><br><span class="line">8054:M 03 Sep 2019 20:01:27.600 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.</span><br><span class="line">8054:M 03 Sep 2019 20:01:27.600 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never &gt; /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.</span><br><span class="line">8054:M 03 Sep 2019 20:01:27.600 * DB loaded from disk: 0.000 seconds</span><br><span class="line">8054:M 03 Sep 2019 20:01:27.601 * Ready to accept connections</span><br></pre></td></tr></table></figure></p>
-<p>按 <strong><em>ctrl+c</em></strong> 停止运行redis。在redis根文件夹下有一份redis的配置文件，你可以根据需要修改redis配置。运行以下指令可以指定配置文件，你也可以直接指定配置选项。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> ./redis-server [/path/to/redis.conf] </span><br><span class="line"><span class="meta">&gt;</span> ./redis-server [--options  value]</span><br></pre></td></tr></table></figure></p>
-<p>启动redis之后，运行以下命令可以进入cli模式。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> ./redis-cli </span><br><span class="line"><span class="meta">&gt;</span> ./redis-cli shutdown      //关闭redis</span><br></pre></td></tr></table></figure></p>
+                <h3 id="主从复制模型"><a href="#主从复制模型" class="headerlink" title="主从复制模型"></a>主从复制模型</h3><p><img src="./redis集群-初探（主从复制）/2019_9_9_redis1.png" alt="主从复制模型"><br>上图为redis主从复制的基本模型，可以看出此模型由两个基本组成部分：Master以及Replica，一个Master可以有多个Replica，一个Replica只有一个Master，另外，一个Replica也可以作为一个Master。</p>
+<h3 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h3><p>为一个从节点配置好主节点之后，从节点会尝试和主节点建立连接，如果没有连接成功，它会重复执行这个过程，直到建立连接为止。建立连接之后，从节点回向主节点发送SYCN命令，主节点收到命令之后，会使用BGSAVE命令生成.rdb文件，并将此文件发送给从节点。从节点获取到.rdb文件之后，会将.rdb文件数据导入到数据库。之后主服务器会在日志中保存写操作，并将其发送到从服务器上，从服务器根据此来进行增量复制。</p>
+<h3 id="配置主从复制"><a href="#配置主从复制" class="headerlink" title="配置主从复制"></a>配置主从复制</h3><h4 id="Master节点"><a href="#Master节点" class="headerlink" title="Master节点"></a>Master节点</h4><p>Master节点并不需要特别的进行配置，按照常态进行启动即可。</p>
+<h4 id="Replica节点"><a href="#Replica节点" class="headerlink" title="Replica节点"></a>Replica节点</h4><p>你可以在redis启动之后使用cli添加主节点：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> replicaof ip port</span><br></pre></td></tr></table></figure></p>
+<p>如果主节点设置了密码，需要额外的设置认证信息：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> config set masterauth pass</span><br></pre></td></tr></table></figure></p>
+<p>也可以直接修改redis启动配置文件，来配置从节点。在配置文件中找到并设置主节点的ip以及port，如果主节点需要认证，则需要额外的设置主节点认证信息：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> replicaof &lt;masterip&gt; &lt;masterport&gt;</span><br><span class="line"><span class="meta">#</span> masterauth &lt;master-password&gt;</span><br></pre></td></tr></table></figure></p>
+<h3 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h3><p>在下面的例子中，我们在一个虚拟机中启动了三个redis实例，一主两从。主节点的port为6379，从节点的port为9090、9091。通过创建3个配置文件并从不同配置文件启动redis实例。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> replica_1.conf</span><br><span class="line">...</span><br><span class="line">replicaof 127.0.0.1 9090</span><br><span class="line">masterauth 123456</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> replica_2.conf</span><br><span class="line">...</span><br><span class="line">replicaof 127.0.0.1 9091</span><br><span class="line">masterauth 123456</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p><strong>notice:</strong> 在启动时注意修改各个redis实例的.pid文件存放位置以及.dir值，以免撒个redis实例文件相互覆盖。</p>
+</blockquote>
+<p>启动三个redis实例之后，在主节点中设置test的值为123，可以在两个从节点中获取到test值：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; set test 123</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:9090&gt; get test</span><br><span class="line">"123"</span><br><span class="line">127.0.0.1:9090&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:9091&gt; get test</span><br><span class="line">"123"</span><br><span class="line">127.0.0.1:9091&gt;</span><br></pre></td></tr></table></figure>
+<p>如果你尝试在从服务器中设置test的值，你将会得到一个错误：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:9090&gt; set test 123</span><br><span class="line">(error) READONLY You can't write against a read only replica.</span><br><span class="line">127.0.0.1:9090&gt;</span><br></pre></td></tr></table></figure></p>
+<p>这是因为从节点是默认只读的：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">replica-read-only yes</span><br></pre></td></tr></table></figure></p>
+<p>你可以修改此配置以关闭从节点只读，但是在从节点保存的数据容易被主节点覆盖或者删除。</p>
+<blockquote>
+<p><strong>notice:</strong> 从节点只读并不是为安全性而设计的。虽然只读从节点不接受写操作，但是依然会暴露一些管理命令，如config，debug等。如果需要提高安全性，应该使用 rename-command 来隐藏这些危险命令。</p>
+</blockquote>
 
                 
 
@@ -225,10 +236,10 @@
                 <!-- Pager -->
                 <ul class="pager">
                     
-                        <li class="previous">
-                            <a href="/2019/09/04/redis-数据结构篇.html" data-toggle="tooltip" data-placement="top" title="redis 数据结构篇">&larr; Previous Post</a>
-                        </li>
                     
+                        <li class="next">
+                            <a href="/2019/09/07/mongodb-基于用户角色的权限控制.html" data-toggle="tooltip" data-placement="top" title="mongodb 基于用户角色的权限控制">Next Post &rarr;</a>
+                        </li>
                     
                 </ul>
 
@@ -253,7 +264,7 @@
         
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#make和gcc"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">make和gcc</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#编译安装Redis"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">编译安装Redis</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#运行Redis"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">运行Redis</span></a></li></ol>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#主从复制模型"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">主从复制模型</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#基本原理"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">基本原理</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#配置主从复制"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">配置主从复制</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#Master节点"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">Master节点</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#Replica节点"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">Replica节点</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#例子"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">例子</span></a></li></ol>
         
         </div>
       </aside>

@@ -132,14 +132,14 @@
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/archive/">Archives</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
@@ -206,6 +206,35 @@
             
                 <!-- Main Content -->
 
+
+<div class="post-preview">
+
+    <a href="/2019/09/09/redis集群-初探（主从复制）.html">
+        <h2 class="post-title">
+            redis集群初探（主从复制）
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            主从复制模型上图为redis主从复制的基本模型，可以看出此模型由两个基本组成部分：Master以及Replica，一个Master可以有多个Replica，一个Replica只有一个Master，另外，一个Replica也可以作为一个Master。
+基本原理为一个从节点配置好主节点之后，从节点会尝试和主节点建立连接，如果没有连接成功，它会重复执行这个过程，直到建立连接为止。建立连接之后，从节......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by FBnoI on
+            2019-09-09
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#redis" title="redis">redis</a>
+            
+        </div>
+    
+
+</div>
+<hr>
 
 <div class="post-preview">
 
@@ -532,7 +561,7 @@ String(字符串)string是我接触的第一个redis数据类......
             
         
             
-            <a href="/tags/#redis" title="redis" rel="5">redis</a>
+            <a href="/tags/#redis" title="redis" rel="6">redis</a>
             
         
     </div>
@@ -587,6 +616,10 @@ String(字符串)string是我接触的第一个redis数据类......
     <ul>
       
         <li>
+          <a href="/2019/09/09/redis集群-初探（主从复制）.html">redis集群初探（主从复制）</a>
+        </li>
+      
+        <li>
           <a href="/2019/09/07/mongodb-基于用户角色的权限控制.html">mongodb 基于用户角色的权限控制</a>
         </li>
       
@@ -600,10 +633,6 @@ String(字符串)string是我接触的第一个redis数据类......
       
         <li>
           <a href="/2019/09/05/linux下安装mongodb.html">linux下安装mongodb</a>
-        </li>
-      
-        <li>
-          <a href="/2019/09/05/redis-登录设置.html">redis 登录设置</a>
         </li>
       
     </ul>
