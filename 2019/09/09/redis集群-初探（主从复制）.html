@@ -211,7 +211,7 @@
                 post-container">
 
                 <h3 id="主从复制模型"><a href="#主从复制模型" class="headerlink" title="主从复制模型"></a>主从复制模型</h3><p><img src="./redis集群-初探（主从复制）/2019_9_9_redis1.png" alt="主从复制模型"><br>上图为redis主从复制的基本模型，可以看出此模型由两个基本组成部分：Master以及Replica，一个Master可以有多个Replica，一个Replica只有一个Master，另外，一个Replica也可以作为一个Master。</p>
-<h3 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h3><p>为一个从节点配置好主节点之后，从节点会尝试和主节点建立连接，如果没有连接成功，它会重复执行这个过程，直到建立连接为止。建立连接之后，从节点回向主节点发送SYCN命令，主节点收到命令之后，会使用BGSAVE命令生成.rdb文件，并将此文件发送给从节点。从节点获取到.rdb文件之后，会将.rdb文件数据导入到数据库。之后主服务器会在日志中保存写操作，并将其发送到从服务器上，从服务器根据此来进行增量复制。</p>
+<h3 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h3><p>为一个从节点配置好主节点之后，从节点会尝试和主节点建立连接，如果没有连接成功，它会重复执行这个过程，直到建立连接为止。建立连接之后，从节点回向主节点发送SYCN命令，主节点收到命令之后，会使用BGSAVE命令生成.rdb文件，并将此文件发送给从节点。从节点获取到.rdb文件之后，会将.rdb文件数据导入到数据库。之后主节点会在日志中保存写操作，并将其发送到从节点上，从节点根据此来进行增量复制。</p>
 <h3 id="配置主从复制"><a href="#配置主从复制" class="headerlink" title="配置主从复制"></a>配置主从复制</h3><h4 id="Master节点"><a href="#Master节点" class="headerlink" title="Master节点"></a>Master节点</h4><p>Master节点并不需要特别的进行配置，按照常态进行启动即可。</p>
 <h4 id="Replica节点"><a href="#Replica节点" class="headerlink" title="Replica节点"></a>Replica节点</h4><p>你可以在redis启动之后使用cli添加主节点：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> replicaof ip port</span><br></pre></td></tr></table></figure></p>
 <p>如果主节点设置了密码，需要额外的设置认证信息：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> config set masterauth pass</span><br></pre></td></tr></table></figure></p>
