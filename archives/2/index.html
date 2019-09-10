@@ -18,7 +18,7 @@
         
     </title>
 
-    <link rel="canonical" href="http://fbnoi.github.io/">
+    <link rel="canonical" href="http://fbnoi.github.io/archives/2/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -209,247 +209,16 @@
 
 <div class="post-preview">
 
-    <a href="/2019/09/09/redis集群-初探（主从复制）.html">
+    <a href="/2019/09/04/redis-数据结构篇.html">
         <h2 class="post-title">
-            redis集群初探（主从复制）
+            redis 数据结构篇
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            主从复制模型上图为redis主从复制的基本模型，可以看出此模型由两个基本组成部分：Master以及Replica，一个Master可以有多个Replica，一个Replica只有一个Master。另外，一个Replica也可以作为一个Master。
-复制过程
-
-配置并启动从节点后，从节点保存主节点信息；
-从节点发现主节点并尝试和主节点建立socket连接;
-连接成功之后，从节点定时发送pin......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by FBnoI on
-            2019-09-09
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#redis" title="redis">redis</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/2019/09/07/mongodb-基于用户角色的权限控制.html">
-        <h2 class="post-title">
-            mongodb 基于用户角色的权限控制
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            mongodb支持基于角色的访问控制（RBAC）来管理对mongodb系统的访问。一个用户可以被授权一个或者多个角色以决定该用户对数据库资源和操作的访问权限。在权限以外，用户是无法访问系统的。
-内建角色mongodb提供内置角色，提供数据库系统中常用的不同访问级别。每个数据库中都存在内置 数据库用户角色 和 数据库管理角色角色 。
-数据库用户角色每个数据库都包含以下角色：
-
-
-
-角色
-描述
-......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by FBnoI on
-            2019-09-07
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#mongodb" title="mongodb">mongodb</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/2019/09/07/mongodb-用户认证.html">
-        <h2 class="post-title">
-            mongodb 用户认证
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            mongodb提供了基于用户名密码的认证和用户角色的访问控制。用户认证和访问控制是独立而又相互关联的两部分。
-添加用户mongodb提供了 db.createUser() 方法来创建用户。该方法接收两个参数。第一个参数是要创建的用户的信息，第二个参数是一个可选参数，用来设置写安全应答。一个用户的属性如下：
-
-
-
-Field
-Type
-Description
-
-
-
-
-user
-string
-用......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by FBnoI on
-            2019-09-07
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#mongodb" title="mongodb">mongodb</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/2019/09/06/mongodb-CRUD操作.html">
-        <h2 class="post-title">
-            mongodb CRUD操作
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            
-参考：mongodb中文文档 (http://www.mongoing.com/docs/index.html)，此网站上有一个非常方便的web shell窗口可供实验，建议直接在上面进行实验操作。
-
-创建数据库启动mongodb并使用shell连接mongodb。使用以下指令可以查看当前所在的mongodb的数据库。1&gt; db
-运行以下指令可以查看所有可用的数据库1234&gt; ......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by FBnoI on
-            2019-09-06
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#mongodb" title="mongodb">mongodb</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/2019/09/05/linux下安装mongodb.html">
-        <h2 class="post-title">
-            linux下安装mongodb
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            下载mongodb安装包mongodb提供了linux各版本的安装包，前往https://www.mongodb.com/download-center/community，并根据自己需要选择配置：选择完成之后下方会生成一个链接，从此链接下载mongodb安装包：1&gt; wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by FBnoI on
-            2019-09-05
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#mongodb" title="mongodb">mongodb</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/2019/09/05/redis-登录设置.html">
-        <h2 class="post-title">
-            redis 登录设置
-        </h2>
-        <h3 class="post-subtitle">
-            设置redis远程连接以及登录密码
-        </h3>
-        <div class="post-content-preview">
-            redis默认只能从本地连接，开启远程连接需要修改redis的启动配置文件，配置文件一般在redis的安装根目录下。
-开启远程连接打开redis 的配置文件，找到以下两行。bind 选项指定可以连接此redis的ip，指定为127.0.0.1表示只接受来自本地的连接请求。protected-mode 选项设置安全模式，开启后如果未指定bing选项并且未设置登录认证密码时，只接受来自本地的连接......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by FBnoI on
-            2019-09-05
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#redis" title="redis">redis</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/2019/09/05/redis-发布与订阅.html">
-        <h2 class="post-title">
-            redis 发布与订阅
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            redis 发布/订阅模式redis实现了发布/订阅消息通信方式，基本模型如下图所示，此模型主要分为3各部分：producer（生产者），channel（频道），consumer（消费者）。生产者生产消息之后发布到频道中，消费者从频道总获取消息。redis只能进行广播，即所有订阅了此频道的消费者都能从频道中获取信息。
-redis 发布/订阅指令redis 的发布/订阅相关指令如下123456......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by FBnoI on
-            2019-09-05
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#redis" title="redis">redis</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/2019/09/04/php-编译安装redis扩展.html">
-        <h2 class="post-title">
-            php 编译安装redis扩展
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            安装Pecl查看时候安装Pecl，运行：1&gt; pecl version
-如果未安装，则运行：1&gt; sudo apt install php-pear
-通过Pecl安装运行命令：1&gt; sudo pecl install redis
-出现以下界面说明安装成功123456789101112131415161718Build complete.Don't forget to run......
+            redis 的英文全称是 Remote Dictionary Server (远程字典服务)，存储结构是key-value结构，value支持多种类型，包括 String, Hash, List, Set, Sorted Set 以及 HyperLogLog，由于之前没有用过 HyperLogLog 类型，所以暂且不介绍他。
+String(字符串)string是我接触的第一个redis数据类......
         </div>
     </a>
     
@@ -459,7 +228,34 @@ redis 发布/订阅指令redis 的发布/订阅相关指令如下123456......
         </p>
         <div class="tags">
             
-              <a href="/tags/#php扩展" title="php扩展">php扩展</a>
+              <a href="/tags/#redis" title="redis">redis</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/2019/09/04/redis编译安装.html">
+        <h2 class="post-title">
+            redis 编译安装
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            make和gcc编译安装redis需要用到make和gcc工具，请确保已经正确安装make和gcc，运行命令查看gcc是否安装1&gt; gcc -v
+编译安装Redis前往 http://redis.io/download 下载最新稳定版本的redis压缩文件，当前的版本为5.0.5。1&gt; wget http://download.redis.io/releases/redis-5.......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by FBnoI on
+            2019-09-04
+        </p>
+        <div class="tags">
             
               <a href="/tags/#redis" title="redis">redis</a>
             
@@ -475,10 +271,10 @@ redis 发布/订阅指令redis 的发布/订阅相关指令如下123456......
 
 <ul class="pager">
     
-    
-        <li class="next">
-            <a href="/archives/2/">Older Posts &rarr;</a>
+        <li class="previous">
+            <a href="/">&larr; Newer Posts</a>
         </li>
+    
     
 </ul>
 

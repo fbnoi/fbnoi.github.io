@@ -147,14 +147,14 @@
 
                         
                         <li>
-                            <a href="/archive/">Archives</a>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
+                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
@@ -210,25 +210,67 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <h3 id="主从复制模型"><a href="#主从复制模型" class="headerlink" title="主从复制模型"></a>主从复制模型</h3><p><img src="./redis集群-初探（主从复制）/2019_9_9_redis1.png" alt="主从复制模型"><br>上图为redis主从复制的基本模型，可以看出此模型由两个基本组成部分：Master以及Replica，一个Master可以有多个Replica，一个Replica只有一个Master，另外，一个Replica也可以作为一个Master。</p>
-<h3 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h3><p>为一个从节点配置好主节点之后，从节点会尝试和主节点建立连接，如果没有连接成功，它会重复执行这个过程，直到建立连接为止。建立连接之后，从节点回向主节点发送SYCN命令，主节点收到命令之后，会使用BGSAVE命令生成.rdb文件，并将此文件发送给从节点。从节点获取到.rdb文件之后，会将.rdb文件数据导入到数据库。之后主节点会在日志中保存写操作，并将其发送到从节点上，从节点根据此来进行增量复制。</p>
-<h3 id="配置主从复制"><a href="#配置主从复制" class="headerlink" title="配置主从复制"></a>配置主从复制</h3><h4 id="Master节点"><a href="#Master节点" class="headerlink" title="Master节点"></a>Master节点</h4><p>Master节点并不需要特别的进行配置，按照常态进行启动即可。</p>
-<h4 id="Replica节点"><a href="#Replica节点" class="headerlink" title="Replica节点"></a>Replica节点</h4><p>你可以在redis启动之后使用cli添加主节点：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> replicaof ip port</span><br></pre></td></tr></table></figure></p>
-<p>如果主节点设置了密码，需要额外的设置认证信息：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> config set masterauth pass</span><br></pre></td></tr></table></figure></p>
-<p>也可以直接修改redis启动配置文件，来配置从节点。在配置文件中找到并设置主节点的ip以及port，如果主节点需要认证，则需要额外的设置主节点认证信息：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> replicaof &lt;masterip&gt; &lt;masterport&gt;</span><br><span class="line"><span class="meta">#</span> masterauth &lt;master-password&gt;</span><br></pre></td></tr></table></figure></p>
-<h3 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h3><p>在下面的例子中，我们在一个虚拟机中启动了三个redis实例，一主两从。主节点的port为6379，从节点的port为9090、9091。通过创建3个配置文件并从不同配置文件启动redis实例。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> replica_1.conf</span><br><span class="line">...</span><br><span class="line">replicaof 127.0.0.1 9090</span><br><span class="line">masterauth 123456</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> replica_2.conf</span><br><span class="line">...</span><br><span class="line">replicaof 127.0.0.1 9091</span><br><span class="line">masterauth 123456</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+                <h3 id="主从复制模型"><a href="#主从复制模型" class="headerlink" title="主从复制模型"></a>主从复制模型</h3><p><img src="./redis集群-初探（主从复制）/2019_9_9_redis1.png" alt="主从复制模型"><br>上图为redis主从复制的基本模型，可以看出此模型由两个基本组成部分：Master以及Replica，一个Master可以有多个Replica，一个Replica只有一个Master。另外，一个Replica也可以作为一个Master。</p>
+<h3 id="复制过程"><a href="#复制过程" class="headerlink" title="复制过程"></a>复制过程</h3><p><img src="./redis集群-初探（主从复制）/2019_9_10_redis1.png" alt="复制过程"></p>
+<ol>
+<li>配置并启动从节点后，从节点保存主节点信息；</li>
+<li>从节点发现主节点并尝试和主节点建立socket连接;</li>
+<li>连接成功之后，从节点定时发送ping命令，并希望接收到pong，如果没有则尝试重新建立连接；</li>
+<li>如果主节点设置了权限，那么就需要进行权限验证；</li>
+<li>权限认证通过之后，从节点会向主节点发送同步请求；</li>
+<li>主节点运行bgsave将数据库中的数据备份到.rdb文件，并将.rdb文件发送给从节点，这一步是全量更新，是最耗时的一步操作。之后主节点会陆续将写操作发送给从节点，来保持主从一致；</li>
+<li>从节点获取到.rdb文件之后将数据导入数据库，并从socket获取到陆续到来的写操作，来保持主从一致。</li>
+</ol>
+<h3 id="数据同步"><a href="#数据同步" class="headerlink" title="数据同步"></a>数据同步</h3><p>从上述的复制过程可以看出，数据同步有两种方式，一种是 <strong>全量复制</strong> ，一种是 <strong>增量复制</strong> 。<br>redis有两个同步命令：sync和psync。sync是redis2.8版本之前的同步命令，在redis2.8版本之前，从节点如果失去了主节点的连接，将进行全量复制，psync就是redis为了优化这一现象而创建的一个新的命令。<br>sync命令就不介绍，这里重点说明psync命令。psync命令依赖三个重要的概念：</p>
+<ol>
+<li>节点runid；</li>
+<li>节点backlog缓冲区；</li>
+<li>节点offset偏移量；</li>
+</ol>
+<h4 id="runid"><a href="#runid" class="headerlink" title="runid"></a>runid</h4><ol>
+<li>每个redis实例在启动时，会在内存中生成一个类似（ed61b4833a620b2ebbfacc675b7bfd2d0b7adc9c）这样的40位runid，此runid并不是pid；</li>
+<li>在redis实例重启之后，之前的runid将会丢失，redis将重新生成一个新的runid；</li>
+</ol>
+<h4 id="backlog缓冲区"><a href="#backlog缓冲区" class="headerlink" title="backlog缓冲区"></a>backlog缓冲区</h4><ol>
+<li>backlog缓冲区是一个保存在内存中的固定长度的单向队列，用来记录所有成功执行的写操作，默认大小为1M，可以使用 info replication （repl_backlog）指令查看；</li>
+<li>参与主从复制的所有节点都会维护自己的一个backlog缓冲区；</li>
+<li>重启之后，backlog缓冲区的数据将会丢失；</li>
+</ol>
+<h4 id="offset偏移量"><a href="#offset偏移量" class="headerlink" title="offset偏移量"></a>offset偏移量</h4><ol>
+<li>参与主从复制的所有节点都会维护自身的一个offset偏移量；</li>
+<li>每当节点（主、从）处理完写操作之后，会统计命令的字节长度并累加到offset偏移量上。</li>
+<li>重启之后，offset偏移量的数据将会丢失。</li>
+</ol>
+<h4 id="psync指令"><a href="#psync指令" class="headerlink" title="psync指令"></a>psync指令</h4><p>redis2.8版本以后，使用指令psync指令进行同步，其格式为 psync {runid} {offset}，其中runid是主节点runid，如果没有默认为-1，offset是从节点的偏移量，没有默认为-1。从节点会使用psync指令进行数据同步：从节点将自己缓存到的主节点runid以及自己的offset偏移量发送至主节点，主节点判断runid是否一致并且offset标识的数据是否依然在缓冲区：</p>
+<p><img src="./redis集群-初探（主从复制）/2019_9_10_redis2.png" alt="增量复制"></p>
+<ol>
+<li>如果runid不一致或者offset偏移量已失效，则主节点将返回 +FULLRESYNC {runId} {offset}，并将.rdb文件发送至从节点，从节点保存主节点runid和offset，并导入.rdb文件数据；</li>
+<li>如果runid一致并且offset依然有效，则主节点将返回 +CONTINUE， 并将backlog缓冲区的数据发送至从节点，从节点以此进行增量同步数据；</li>
+<li>如果主节点不支持psync指令，将返回+ERR，并使用sync来进行全量同步。</li>
+</ol>
+<h4 id="全量复制"><a href="#全量复制" class="headerlink" title="全量复制"></a>全量复制</h4><p>在redis2.8版本之前，redis使用sync指令进行同步，此时为全量复制，redis2.8版本之后添加了指令psync同时支持全量复制和增量复制。</p>
+<ol>
+<li>从节点发送命令 psync ? -1；</li>
+<li>主节点根据命令返回 +FULLRESYNC {runId} {offset}，并运行bgsave指令，生成.rdb文件发送给从节点，并开始维护backlog，记录从现在开始执行成功的写指令；</li>
+<li>从节点保存主节点runid和offset，清空数据，接收主节点.rdb文件并导入数据；</li>
+<li>从节点成功加载完 RBD 后，如果开启了 AOF，会立刻做 bgrewriteaof。</li>
+</ol>
 <blockquote>
-<p><strong>notice:</strong> 在启动时注意修改各个redis实例的.pid文件存放位置以及.dir值，以免撒个redis实例文件相互覆盖。</p>
+<p><strong>notice:</strong> </p>
+<ol>
+<li>在主节点执行bgsave保存当前数据到.rdb文件时，如果消耗了大量的时间，从节点迟迟得不到回应，可能会触发超时。</li>
+<li>如果整个全量复制过程耗费了大量时间，而在这期间，主服务器进行了大量的写操作，导致backlog无法保存所有的写指令，这时就会发生缓冲区溢出，复制失败。</li>
+</ol>
 </blockquote>
-<p>启动三个redis实例之后，在主节点中设置test的值为123，可以在两个从节点中获取到test值：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; set test 123</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379</span><br></pre></td></tr></table></figure></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:9090&gt; get test</span><br><span class="line">"123"</span><br><span class="line">127.0.0.1:9090&gt;</span><br></pre></td></tr></table></figure>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:9091&gt; get test</span><br><span class="line">"123"</span><br><span class="line">127.0.0.1:9091&gt;</span><br></pre></td></tr></table></figure>
-<p>如果你尝试在从服务器中设置test的值，你将会得到一个错误：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:9090&gt; set test 123</span><br><span class="line">(error) READONLY You can't write against a read only replica.</span><br><span class="line">127.0.0.1:9090&gt;</span><br></pre></td></tr></table></figure></p>
-<p>这是因为从节点是默认只读的：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">replica-read-only yes</span><br></pre></td></tr></table></figure></p>
-<p>你可以修改此配置以关闭从节点只读，但是在从节点保存的数据容易被主节点覆盖或者删除。</p>
-<blockquote>
-<p><strong>notice:</strong> 从节点只读并不是为安全性而设计的。虽然只读从节点不接受写操作，但是依然会暴露一些管理命令，如config，debug等。如果需要提高安全性，应该使用 rename-command 来隐藏这些危险命令。</p>
-</blockquote>
+<h4 id="增量复制"><a href="#增量复制" class="headerlink" title="增量复制"></a>增量复制</h4><p>在从节点复制主节点的过程中，如果出现网络问题或者其他异常，可能会导致从节点失去和主节点的连接，从节点会在重新连接后发出增量复制请求，主节点只需将保存在backlog中的数据发送给从节点即可保证数据一致性：</p>
+<ol>
+<li>从节点重新建立连接后，发送psync {runid} {offset}；</li>
+<li>主节点验证runid以及offset，如果满足增量复制的条件，则返回 +CONTINUE 响应。</li>
+<li>主节点将缓冲区的数据发送到从节点，保证主从复制进行正常状态。</li>
+</ol>
+<h3 id="心跳检测"><a href="#心跳检测" class="headerlink" title="心跳检测"></a>心跳检测</h3><p>redis主从连接依赖心跳机制来维持。默认从节点每10秒向主节点发送一次ping命令，可以通过修改repl-ping-replica-period参数的值来修改心跳发送间隔。从节点发送ping命令之后，会等待主节点回复pong，默认超时时间为60s，如果60秒之内没有返回，则判定为超时，此时从节点会尝试重新建立连接。</p>
+<p>从节点也会通过心跳机制来想主节点上报自己的offset偏移量（replconf ack{offset}），来进行增量复制保持主从一致，主节点收到 replconf 信息后，判断从节点超时时间，如果超过 repl-timeout 值，则判断从节点下线。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>本文比较简单的记录了我学习redis主从复制的原理的过程，包括主从复制模型、数据同步、psync指令、全量复制、增量复制、心跳检测。在redis2.8之后引入的psync指令极大的改善了redis主从复制的性能，但是redis的数据同步依然是一个复杂、耗时的过程，也可以体会到redis在处理大量数据上的瓶颈。</p>
 
                 
 
@@ -264,7 +306,7 @@
         
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#主从复制模型"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">主从复制模型</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#基本原理"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">基本原理</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#配置主从复制"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">配置主从复制</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#Master节点"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">Master节点</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#Replica节点"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">Replica节点</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#例子"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">例子</span></a></li></ol>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#主从复制模型"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">主从复制模型</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#复制过程"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">复制过程</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#数据同步"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">数据同步</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#runid"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">runid</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#backlog缓冲区"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">backlog缓冲区</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#offset偏移量"><span class="toc-nav-number">3.3.</span> <span class="toc-nav-text">offset偏移量</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#psync指令"><span class="toc-nav-number">3.4.</span> <span class="toc-nav-text">psync指令</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#全量复制"><span class="toc-nav-number">3.5.</span> <span class="toc-nav-text">全量复制</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#增量复制"><span class="toc-nav-number">3.6.</span> <span class="toc-nav-text">增量复制</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#心跳检测"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">心跳检测</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#总结"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">总结</span></a></li></ol>
         
         </div>
       </aside>
