@@ -147,14 +147,14 @@
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
+                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/archive/">Archives</a>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
@@ -270,7 +270,12 @@
 </ol>
 <h3 id="心跳检测"><a href="#心跳检测" class="headerlink" title="心跳检测"></a>心跳检测</h3><p>redis主从连接依赖心跳机制来维持。默认从节点每10秒向主节点发送一次ping命令，可以通过修改repl-ping-replica-period参数的值来修改心跳发送间隔。从节点发送ping命令之后，会等待主节点回复pong，默认超时时间为60s，如果60秒之内没有返回，则判定为超时，此时从节点会尝试重新建立连接。</p>
 <p>从节点也会通过心跳机制来想主节点上报自己的offset偏移量（replconf ack{offset}），来进行增量复制保持主从一致，主节点收到 replconf 信息后，判断从节点超时时间，如果超过 repl-timeout 值，则判断从节点下线。</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>本文比较简单的记录了我学习redis主从复制的原理的过程，包括主从复制模型、数据同步、psync指令、全量复制、增量复制、心跳检测。在redis2.8之后引入的psync指令极大的改善了redis主从复制的性能，但是redis的数据同步依然是一个复杂、耗时的过程，也可以体会到redis在处理大量数据上的瓶颈。</p>
+<h3 id="简单示例"><a href="#简单示例" class="headerlink" title="简单示例"></a>简单示例</h3><p>redis的主节点并不需要进行特别的配置，只是注意在部署各节点时，向准备部署的各节点开放ip限制。<br>在本示例中，将创建3个虚拟机，一个用来部署主节点，其他两个部署从节点。</p>
+<p>先启动并使用cli连接主节点：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> ./redis-server --daemonize yes [--bind ip1,ip2,]</span><br><span class="line"><span class="meta">&gt;</span> ./redis-cli</span><br></pre></td></tr></table></figure></p>
+<p>然后启动并使用cli连接从节点：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> ./redis-server --daemonize yes [--bind ip]</span><br><span class="line"><span class="meta">&gt;</span> ./redis-cli</span><br><span class="line"><span class="meta">&gt;</span> replicaof master-ip port  #设置为从节点</span><br><span class="line"><span class="meta">&gt;</span> auth master-pass   # 如果主节点设置了密码，则需先进行验证</span><br></pre></td></tr></table></figure></p>
+<p>此时一个简单的主从复制的redis集群已经部署完毕了，向主节点设置一个键值对，可以在从节点获取数据：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> set replica 123</span><br><span class="line">OK</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> get replica</span><br><span class="line">"123"</span><br></pre></td></tr></table></figure>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>本文比较简单的记录了我学习redis主从复制的原理的过程，包括主从复制模型、数据同步、psync指令、全量复制、增量复制、心跳检测。redis的主从机制有效的缓解了数据恢复、读负载均衡，但其缺陷依然很明显：主节点宕机无法自动恢复；单点写操作无法负载均衡；存储能力受到主节点单机限制等。</p>
 
                 
 
@@ -306,7 +311,7 @@
         
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#主从复制模型"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">主从复制模型</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#复制过程"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">复制过程</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#数据同步"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">数据同步</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#runid"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">runid</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#backlog缓冲区"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">backlog缓冲区</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#offset偏移量"><span class="toc-nav-number">3.3.</span> <span class="toc-nav-text">offset偏移量</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#psync指令"><span class="toc-nav-number">3.4.</span> <span class="toc-nav-text">psync指令</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#全量复制"><span class="toc-nav-number">3.5.</span> <span class="toc-nav-text">全量复制</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#增量复制"><span class="toc-nav-number">3.6.</span> <span class="toc-nav-text">增量复制</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#心跳检测"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">心跳检测</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#总结"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">总结</span></a></li></ol>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#主从复制模型"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">主从复制模型</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#复制过程"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">复制过程</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#数据同步"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">数据同步</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#runid"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">runid</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#backlog缓冲区"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">backlog缓冲区</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#offset偏移量"><span class="toc-nav-number">3.3.</span> <span class="toc-nav-text">offset偏移量</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#psync指令"><span class="toc-nav-number">3.4.</span> <span class="toc-nav-text">psync指令</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#全量复制"><span class="toc-nav-number">3.5.</span> <span class="toc-nav-text">全量复制</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#增量复制"><span class="toc-nav-number">3.6.</span> <span class="toc-nav-text">增量复制</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#心跳检测"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">心跳检测</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#简单示例"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">简单示例</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#总结"><span class="toc-nav-number">6.</span> <span class="toc-nav-text">总结</span></a></li></ol>
         
         </div>
       </aside>
