@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content>
+    <meta name="keyword" content>
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          redis集群初探（哨兵） - FBnoI | Blog
+        
+    </title>
+
+    <link rel="canonical" href="http://fbnoi.github.io/2019/09/12/redis集群初探（哨兵）.html">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('')
+            /*post*/
+        
+    }
+    
+</style>
+
+<header class="intro-header" >
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#redis" title="redis">redis</a>
+                            
+                        </div>
+                        <h1>redis集群初探（哨兵）</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by FBnoI on
+                            2019-09-12
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">FBnoI</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <p>单纯的使用redis主从复制存在着很多的问题，其中一个就是当主节点宕机之后，无法自动恢复故障，需要手动重启主节点或者将从节点升格为主节点，这在实际的应用中维护成本太高，而且很难得到及时的处理。redis提供了哨兵模式解决这个问题。</p>
+<h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>哨兵模式是redis提供的一种特殊模式，它运行在一个单独的进程中，通过定时发送命令获取redis实例的状态来监控多个redis，当发现主节点宕掉，会自动将一个从节点切换为主节点，以保证整个主从复制结构可以正常的运行。其基本模型如下：</p>
+<p><img src="./redis集群初探（哨兵）/2019_9_10_redis2.png" alt="模型"></p>
+<p>在哨兵模式当中，往往会存在多个哨兵同时对redis集群进行监控，哨兵之间也会相互监控，以保证整个哨兵系统的稳定与安全；一个健壮的哨兵系统至少有3个哨兵；</p>
+<h3 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h3><p>在哨兵模式中，哨兵们主要完成两件工作：</p>
+<ol>
+<li>定时的发送命令获取主节点和从节点的运行状态；</li>
+<li>当主节点发生故障导致不可达之后，进行故障转移；</li>
+</ol>
+<h4 id="获取节点信息"><a href="#获取节点信息" class="headerlink" title="获取节点信息"></a>获取节点信息</h4><p>哨兵的主要工作之一，就是监控各个节点的状态。通常哨兵每秒发送一次ping命令给系统中所有的实例，每十秒发送一次info命令给所有监控的节点以获取节点信息，每两秒通过订阅/发布向其他哨兵通报自己的状态。<br>你可以使用以下命令查看主节点的状态：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> redis-cli -p sentinel-port  # 请务必保证哨兵已经运行</span><br><span class="line"><span class="meta">&gt;</span> sentinel master mymaster</span><br><span class="line"> 1) "name"</span><br><span class="line"> 2) "mymaster"</span><br><span class="line"> 3) "ip"</span><br><span class="line"> 4) "master-ip"</span><br><span class="line"> 5) "port"</span><br><span class="line"> 6) "6379"</span><br><span class="line"> 7) "runid"</span><br><span class="line"> 8) "c950cc1fd3c5e450646801e724fa8819c5fb2398"</span><br><span class="line"> 9) "flags"</span><br><span class="line">10) "master"</span><br><span class="line">11) "link-pending-commands"</span><br><span class="line">12) "0"</span><br><span class="line">13) "link-refcount"</span><br><span class="line">14) "1"</span><br><span class="line">15) "last-ping-sent"</span><br><span class="line">16) "0"</span><br><span class="line">17) "last-ok-ping-reply"</span><br><span class="line">18) "341"</span><br><span class="line">19) "last-ping-reply"</span><br><span class="line">20) "341"</span><br><span class="line">21) "down-after-milliseconds"</span><br><span class="line">22) "60000"</span><br><span class="line">23) "info-refresh"</span><br><span class="line">24) "7450"</span><br><span class="line">25) "role-reported"</span><br><span class="line">26) "master"</span><br><span class="line">27) "role-reported-time"</span><br><span class="line">28) "7582"</span><br><span class="line">29) "config-epoch"</span><br><span class="line">30) "0"</span><br><span class="line">31) "num-slaves"</span><br><span class="line">32) "2"</span><br><span class="line">33) "num-other-sentinels"</span><br><span class="line">34) "2"</span><br><span class="line">35) "quorum"</span><br><span class="line">36) "2"</span><br><span class="line">37) "failover-timeout"</span><br><span class="line">38) "180000"</span><br><span class="line">39) "parallel-syncs"</span><br><span class="line">40) "1"</span><br></pre></td></tr></table></figure></p>
+<p>可以看见此命令打出了一些有关主节点和集群的一些信息，其中：</p>
+<ol>
+<li>num-slaves 值为2表示哨兵已在此集群中发现了两个从节点；</li>
+<li>num-other-sentinels 值为2表示哨兵已经探知到另外两个哨兵的存在；</li>
+</ol>
+<p>你也可以使用以下两个命令查看从节点和其他哨兵的信息：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> sentinel replicas mymaster            //查看从节点的信息</span><br><span class="line"><span class="meta">&gt;</span> sentinel sentinels mymaster           //查看其他哨兵信息</span><br></pre></td></tr></table></figure></p>
+<h4 id="故障转移"><a href="#故障转移" class="headerlink" title="故障转移"></a>故障转移</h4><p>故障转移是一个比较复杂的过程，它依赖两个重要概念：主观下线（SDOWN） 和客观下线（ODOWN）。</p>
+<p>主观下线表示本地的哨兵确认节点无法访问。一个主节点被标记为主观下线意味着此节点在指定的时间内没有回复本地哨兵的ping指令或者回复无效，该时间由参数 <strong>down-after-milliseconds</strong> 指定，仅仅满足主观下线并不能触发故障转移。</p>
+<p>当哨兵发现主节点主观下线之后，会通知其他的哨兵，并询问他们是否能访问此节点，当超过 quorum 数的哨兵认为此节点主观下线时，此节点将会被标记为客观下线。</p>
+<blockquote>
+<p><strong>notice:</strong> 主观下线的概念只适用于主节点，其他从节点包括哨兵只有客观下线的状态，而且此客观下线状态并不会被选举执行故障转移</p>
+</blockquote>
+<p>当哨兵发现主节点被标记为客观下线之后，会和其他节点协商选举出领头哨兵并选举出合适的从节点作为新的主节点，由领头哨兵执行故障转移过程。</p>
+<h5 id="领头哨兵选举"><a href="#领头哨兵选举" class="headerlink" title="领头哨兵选举"></a>领头哨兵选举</h5><p>每个发现主节点客观下线的哨兵，都可以参与领头哨兵选举，并要求其他哨兵选取自己。选举时先到先得，只有获取到大多数哨兵支持，才能成为领头哨兵。当一个哨兵被授权进行故障转移时，将为新的主节点生成一个epoch作为新主节点的版本号。</p>
+<blockquote>
+<p><strong>notice:</strong> 如果一个哨兵系统中，只有少数的哨兵正常运行，则不会有哨兵当选领头哨兵，也就无法进行故障转移过程。</p>
+</blockquote>
+<h5 id="新主节点选举"><a href="#新主节点选举" class="headerlink" title="新主节点选举"></a>新主节点选举</h5><p>当领头哨兵准备进行故障转移时，一个合适的从节点需要被选举出来，成为新的主节点。该从节点必须满足一下要求：<br>该节点从旧的主节点断开连接的时间time1，不得大于主节点配置超时（down-after-milliseconds）的十倍加上领头节点从发现旧主节点客观下线到执行故障转移的时间time2，<br>即：<strong>time1 &lt; down-after-milliseconds * 10 + time2</strong><br>选举只会从满足上述要求的从节点中寻找更合适的节点。节点的选举需要评估节点的以下信息：</p>
+<ol>
+<li>从节点优先级</li>
+<li>复制偏移量</li>
+<li>运行ID</li>
+</ol>
+<p>节点的优先级由节点的配置选项 replica-priority 指定，优先值越小，优先级越低，但是如果一个节点的优先级被设置为 0 ，则此节点将永远不会被设置为主节点。如果优先级一样则复制偏移量越大的节点将会被选择。如果偏移量一样，则运行id最小的节点将会被选择。</p>
+<h5 id="配置广播"><a href="#配置广播" class="headerlink" title="配置广播"></a>配置广播</h5><p>领头哨兵将发送 replicaof no one 指令给选举的从节点并且将其切换为主节点。当这一步完成之后，故障转移被认为已经成功，随后领头哨兵将会通过订阅/发布，将新的主节点配置广播给其他的哨兵已更新主节点配置。其他哨兵收到主节点配置之后，会与本地比较主节点配置的版本号，即epoch，如果新配置的epoch更大，则更新自己的主节点配置，最终所有的哨兵都将更新主节点配置到最新状态。</p>
+<h3 id="部署示例"><a href="#部署示例" class="headerlink" title="部署示例"></a>部署示例</h3><p>一个简单的sentinel配置如下：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">port 5000                                           # sentinel运行在5000端口</span><br><span class="line">sentinel monitor mymaster 127.0.0.1 6379 2          # sentinel将监控在本地的6379端口的主节点 quorum 为2</span><br><span class="line">sentinel down-after-milliseconds mymaster 5000      # 下线超时时间为5秒</span><br><span class="line">sentinel failover-timeout mymaster 60000            # 故障转移超时时间为1分钟</span><br><span class="line">sentinel parallel-syncs mymaster 1                  # 同时与主节点进行数据同步的节点数量</span><br><span class="line">dir './'                                            # 哨兵的工作目录</span><br><span class="line">logfile './sentinel_5000.log'                       # 哨兵日志</span><br><span class="line">daemonize yes                                       # 开启守护进程</span><br></pre></td></tr></table></figure></p>
+<p>我们将在三个不同的虚拟机中启动三个节点和三个哨兵。<br>先启动redis主从复制，然后在启动哨兵并使用cli连接：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> redis-sentinel /path/to/sentinel-config</span><br><span class="line"><span class="meta">&gt;</span> redis-cli -p 5000</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p><strong>notice:</strong> 注意要保证哨兵和节点间能正常的进行访问。</p>
+</blockquote>
+<p>使用以下命令可以查看各节点和哨兵的状态：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> sentinel master mymaster      //查看主节点</span><br><span class="line"><span class="meta">&gt;</span> sentinel replicas mymaster    //查看从节点</span><br><span class="line"><span class="meta">&gt;</span> sentinel sentinels mymaster   //查看哨兵</span><br></pre></td></tr></table></figure></p>
+<p>你可以使用 debug sleep 指令来模拟主节下线的状态，然后查看日志，会发现哨兵会进行故障转移过程：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">6725:X 12 Sep 2019 06:37:31.853 # +sdown master mymaster 192.168.0.129 6379</span><br><span class="line">6725:X 12 Sep 2019 06:37:31.936 # +odown master mymaster 192.168.0.129 6379 #quorum 2/2</span><br><span class="line">6725:X 12 Sep 2019 06:37:31.936 # +new-epoch 3</span><br><span class="line">6725:X 12 Sep 2019 06:37:31.936 # +try-failover master mymaster 192.168.0.129 6379</span><br><span class="line">6725:X 12 Sep 2019 06:37:31.971 # +vote-for-leader 32b0b77dbb8670f79e913be1661f8f56b377d18f 3</span><br><span class="line">6725:X 12 Sep 2019 06:37:31.973 # 445f225fc2e762442aa95d2924e93b926ec75e7f voted for 445f225fc2e762442aa95d2924e93b926ec75e7f 3</span><br><span class="line">6725:X 12 Sep 2019 06:37:32.017 # c762cd843b5041fd8d9089bee9278c90177d69e9 voted for 32b0b77dbb8670f79e913be1661f8f56b377d18f 3</span><br><span class="line">6725:X 12 Sep 2019 06:37:32.038 # +elected-leader master mymaster 192.168.0.129 6379</span><br><span class="line">6725:X 12 Sep 2019 06:37:32.038 # +failover-state-select-slave master mymaster 192.168.0.129 6379</span><br><span class="line">6725:X 12 Sep 2019 06:37:32.105 # +selected-slave slave 192.168.0.128:6379 192.168.0.128 6379 @ mymaster 192.168.0.129 6379</span><br><span class="line">6725:X 12 Sep 2019 06:37:32.105 * +failover-state-send-slaveof-noone slave 192.168.0.128:6379 192.168.0.128 6379 @ mymaster 192.168.0.129 6379</span><br><span class="line">6725:X 12 Sep 2019 06:37:32.160 * +failover-state-wait-promotion slave 192.168.0.128:6379 192.168.0.128 6379 @ mymaster 192.168.0.129 6379</span><br><span class="line">6725:X 12 Sep 2019 06:37:32.999 # +promoted-slave slave 192.168.0.128:6379 192.168.0.128 6379 @ mymaster 192.168.0.129 6379</span><br><span class="line">6725:X 12 Sep 2019 06:37:32.999 # +failover-state-reconf-slaves master mymaster 192.168.0.129 6379</span><br><span class="line">6725:X 12 Sep 2019 06:37:33.079 * +slave-reconf-sent slave 192.168.0.179:6379 192.168.0.179 6379 @ mymaster 192.168.0.129 6379</span><br><span class="line">6725:X 12 Sep 2019 06:37:34.024 * +slave-reconf-inprog slave 192.168.0.179:6379 192.168.0.179 6379 @ mymaster 192.168.0.129 6379</span><br></pre></td></tr></table></figure></p>
+<p>你可以使用以下指令来查看当前主节点的ip<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> sentinel get-master-addr-by-name mymaster</span><br><span class="line">1) "192.168.0.129"</span><br><span class="line">2) "6379"</span><br></pre></td></tr></table></figure></p>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                    
+                        <li class="next">
+                            <a href="/2019/09/09/redis集群-初探（主从复制）.html" data-toggle="tooltip" data-placement="top" title="redis集群初探（主从复制）">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+    
+      <aside id="sidebar">
+        
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#概述"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">概述</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#基本原理"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">基本原理</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#获取节点信息"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">获取节点信息</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#故障转移"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">故障转移</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#领头哨兵选举"><span class="toc-nav-number">2.2.1.</span> <span class="toc-nav-text">领头哨兵选举</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#新主节点选举"><span class="toc-nav-number">2.2.2.</span> <span class="toc-nav-text">新主节点选举</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#配置广播"><span class="toc-nav-number">2.2.3.</span> <span class="toc-nav-text">配置广播</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#部署示例"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">部署示例</span></a></li></ol>
+        
+        </div>
+      </aside>
+    
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#redis" title="redis">redis</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="#" target="_blank">It Helps SEO</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/fbnoi">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; FBnoI 2019 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    re-Ported by <a href="http://fbnoi.github.io">FBnoI</a> | 
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="91px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=YenYuHsuan&repo=hexo-theme-beantech&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("http://fbnoi.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+
+<!-- Baidu Tongji -->
+
+<script>
+    // dynamic User by Hux
+    var _baId = '9757717a117c3efb8b4a4c7cb73bc46e';
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="http://fbnoi.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

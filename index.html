@@ -209,6 +209,35 @@
 
 <div class="post-preview">
 
+    <a href="/2019/09/12/redis集群初探（哨兵）.html">
+        <h2 class="post-title">
+            redis集群初探（哨兵）
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            单纯的使用redis主从复制存在着很多的问题，其中一个就是当主节点宕机之后，无法自动恢复故障，需要手动重启主节点或者将从节点升格为主节点，这在实际的应用中维护成本太高，而且很难得到及时的处理。redis提供了哨兵模式解决这个问题。
+概述哨兵模式是redis提供的一种特殊模式，它运行在一个单独的进程中，通过定时发送命令获取redis实例的状态来监控多个redis，当发现主节点宕掉，会自动将一个......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by FBnoI on
+            2019-09-12
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#redis" title="redis">redis</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
     <a href="/2019/09/09/redis集群-初探（主从复制）.html">
         <h2 class="post-title">
             redis集群初探（主从复制）
@@ -436,39 +465,6 @@ redis 发布/订阅指令redis 的发布/订阅相关指令如下123456......
 </div>
 <hr>
 
-<div class="post-preview">
-
-    <a href="/2019/09/04/php-编译安装redis扩展.html">
-        <h2 class="post-title">
-            php 编译安装redis扩展
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            安装Pecl查看时候安装Pecl，运行：1&gt; pecl version
-如果未安装，则运行：1&gt; sudo apt install php-pear
-通过Pecl安装运行命令：1&gt; sudo pecl install redis
-出现以下界面说明安装成功123456789101112131415161718Build complete.Don't forget to run......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by FBnoI on
-            2019-09-04
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#redis" title="redis">redis</a>
-            
-              <a href="/tags/#php扩展" title="php扩展">php扩展</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
 
 
 <!-- Pager -->
@@ -505,13 +501,13 @@ redis 发布/订阅指令redis 的发布/订阅相关指令如下123456......
     <div class="tags">
         
             
-            <a href="/tags/#redis" title="redis" rel="6">redis</a>
-            
-        
-            
             <a href="/tags/#mongodb" title="mongodb" rel="4">mongodb</a>
             
         
+            
+        
+            
+            <a href="/tags/#redis" title="redis" rel="7">redis</a>
             
         
     </div>
@@ -566,6 +562,10 @@ redis 发布/订阅指令redis 的发布/订阅相关指令如下123456......
     <ul>
       
         <li>
+          <a href="/2019/09/12/redis集群初探（哨兵）.html">redis集群初探（哨兵）</a>
+        </li>
+      
+        <li>
           <a href="/2019/09/09/redis集群-初探（主从复制）.html">redis集群初探（主从复制）</a>
         </li>
       
@@ -579,10 +579,6 @@ redis 发布/订阅指令redis 的发布/订阅相关指令如下123456......
       
         <li>
           <a href="/2019/09/06/mongodb-CRUD操作.html">mongodb CRUD操作</a>
-        </li>
-      
-        <li>
-          <a href="/2019/09/05/linux下安装mongodb.html">linux下安装mongodb</a>
         </li>
       
     </ul>
