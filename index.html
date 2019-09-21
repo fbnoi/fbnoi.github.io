@@ -209,6 +209,38 @@
 
 <div class="post-preview">
 
+    <a href="/2019/09/21/redis集群初探（redis-cluster）.html">
+        <h2 class="post-title">
+            redis集群初探（redis cluster）
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            redis从3.0版本开始支持redis cluster。
+数据分片redis cluster没有使用一致性hash进行数据分片，而是采用了哈希槽的概念。redis cluster一共有16384（0~16383）个哈希槽，在部署集群之后，会将所有的哈希槽分成特定的区间。比如集群有三个节点A、B、C，则哈希槽将被分成3个区间：
+
+节点A包含从0到5500的散列槽。
+节点B包含从5501到11......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by FBnoI on
+            2019-09-21
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#redis" title="redis">redis</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
     <a href="/2019/09/12/redis集群初探（哨兵）.html">
         <h2 class="post-title">
             redis集群初探（哨兵）
@@ -436,35 +468,6 @@ string
 </div>
 <hr>
 
-<div class="post-preview">
-
-    <a href="/2019/09/05/redis-发布与订阅.html">
-        <h2 class="post-title">
-            redis 发布与订阅
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            redis 发布/订阅模式redis实现了发布/订阅消息通信方式，基本模型如下图所示，此模型主要分为3各部分：producer（生产者），channel（频道），consumer（消费者）。生产者生产消息之后发布到频道中，消费者从频道总获取消息。redis只能进行广播，即所有订阅了此频道的消费者都能从频道中获取信息。
-redis 发布/订阅指令redis 的发布/订阅相关指令如下123456......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by FBnoI on
-            2019-09-05
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#redis" title="redis">redis</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
 
 
 <!-- Pager -->
@@ -507,7 +510,7 @@ redis 发布/订阅指令redis 的发布/订阅相关指令如下123456......
             
         
             
-            <a href="/tags/#redis" title="redis" rel="7">redis</a>
+            <a href="/tags/#redis" title="redis" rel="8">redis</a>
             
         
     </div>
@@ -562,6 +565,10 @@ redis 发布/订阅指令redis 的发布/订阅相关指令如下123456......
     <ul>
       
         <li>
+          <a href="/2019/09/21/redis集群初探（redis-cluster）.html">redis集群初探（redis cluster）</a>
+        </li>
+      
+        <li>
           <a href="/2019/09/12/redis集群初探（哨兵）.html">redis集群初探（哨兵）</a>
         </li>
       
@@ -575,10 +582,6 @@ redis 发布/订阅指令redis 的发布/订阅相关指令如下123456......
       
         <li>
           <a href="/2019/09/07/mongodb-用户认证.html">mongodb 用户认证</a>
-        </li>
-      
-        <li>
-          <a href="/2019/09/06/mongodb-CRUD操作.html">mongodb CRUD操作</a>
         </li>
       
     </ul>

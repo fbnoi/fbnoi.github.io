@@ -237,7 +237,7 @@
 <blockquote>
 <p><strong>notice:</strong> 如果一个哨兵系统中，只有少数的哨兵正常运行，则不会有哨兵当选领头哨兵，也就无法进行故障转移过程。</p>
 </blockquote>
-<h5 id="新主节点选举"><a href="#新主节点选举" class="headerlink" title="新主节点选举"></a>新主节点选举</h5><p>当领头哨兵准备进行故障转移时，一个合适的从节点需要被选举出来，成为新的主节点。该从节点必须满足一下要求：<br>该节点从旧的主节点断开连接的时间time1，不得大于主节点配置超时（down-after-milliseconds）的十倍加上领头节点从发现旧主节点客观下线到执行故障转移的时间time2，<br>即：<strong>time1 &lt; down-after-milliseconds * 10 + time2</strong><br>选举只会从满足上述要求的从节点中寻找更合适的节点。节点的选举需要评估节点的以下信息：</p>
+<h5 id="新主节点选举"><a href="#新主节点选举" class="headerlink" title="新主节点选举"></a>新主节点选举</h5><p>当领头哨兵准备进行故障转移时，一个合适的从节点需要被选举出来，成为新的主节点。该从节点必须满足一下要求：<br>该节点从旧的主节点断开连接的时间time1，不得大于主节点配置超时（down-after-milliseconds）的十倍加上领头节点从发现旧主节点客观下线到执行故障转移的时间time2，<br>即：<strong>time1 &lt; down-after-milliseconds * 10 + time2</strong> 。<br>选举只会从满足上述要求的从节点中寻找更合适的节点。节点的选举需要评估节点的以下信息：</p>
 <ol>
 <li>从节点优先级</li>
 <li>复制偏移量</li>
@@ -259,6 +259,10 @@
                 <hr>
                 <!-- Pager -->
                 <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2019/09/21/redis集群初探（redis-cluster）.html" data-toggle="tooltip" data-placement="top" title="redis集群初探（redis cluster）">&larr; Previous Post</a>
+                        </li>
                     
                     
                         <li class="next">
